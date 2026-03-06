@@ -1,0 +1,4 @@
+  351 src/sublingo/core/ai_client.py
+  254 src/sublingo/core/translator.py
+   39 src/sublingo/core/glossary.py
+  644 total

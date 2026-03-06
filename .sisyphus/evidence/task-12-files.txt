@@ -1,0 +1,4 @@
+src/sublingo/i18n/sublingo_en.qm
+src/sublingo/i18n/sublingo_en.ts
+src/sublingo/i18n/sublingo_zh_Hans.qm
+src/sublingo/i18n/sublingo_zh_Hans.ts
