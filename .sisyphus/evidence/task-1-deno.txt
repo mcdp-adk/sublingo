@@ -1,0 +1,1 @@
+deno not found: install Deno as system dependency for yt-dlp EJS support

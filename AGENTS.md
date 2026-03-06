@@ -15,7 +15,11 @@
   - `uv sync`
   - `uv run pytest`
   - `uv run python -m <module>`
-- 禁止调用项目外运行时或外部二进制依赖（包括但不限于 `yt-dlp`、`deno`、`ffmpeg`）。
+- 原则上禁止调用项目外运行时或外部二进制依赖。
+- 例外：允许使用在 `pyproject.toml` 中声明并由 `uv` 管理的二进制能力：
+  - `yt-dlp[default]`（提供 `yt-dlp`）
+  - `static-ffmpeg`（提供 `ffmpeg`、`ffprobe`）
+- `deno` 作为 `yt-dlp` EJS 能力所需系统依赖，允许作为运行前置条件，但不通过 `pip`/系统 Python 单独安装项目 Python 依赖。
 - 禁止直接使用系统 `python` / `pip` / `pytest` 执行项目任务。
 
 ## 2. Code Quality Policy

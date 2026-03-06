@@ -1,7 +1,7 @@
 ---
 globs: ["**/*.py", "pyproject.toml", "uv.lock"]
 alwaysApply: false
-description: "Python runtime policy: uv-only workflow and no external binary dependencies"
+description: "Python runtime policy: uv-only workflow with declared binary dependency exceptions"
 ---
 
 # Python Runtime Rules（uv-only）
@@ -17,10 +17,11 @@ description: "Python runtime policy: uv-only workflow and no external binary dep
 ## Forbidden
 
 - 禁止依赖系统全局 Python 或项目外虚拟环境。
-- 禁止引入外部运行时/外部二进制依赖作为开发前提，例如：
-  - `yt-dlp`
-  - `deno`
-  - `ffmpeg`
+- 原则上禁止引入项目声明之外的外部运行时/二进制依赖。
+- 允许例外（必须在 `pyproject.toml` 声明并由 `uv` 同步）：
+  - `yt-dlp[default]`（`yt-dlp` 命令与 Python API）
+  - `static-ffmpeg`（`ffmpeg`、`ffprobe` 二进制）
+- `deno` 允许作为系统级前置依赖，仅用于 `yt-dlp` 的 EJS 场景。
 - 禁止使用 `pip install` 直装项目依赖（应由 `uv` 统一管理）。
 
 ## Verification

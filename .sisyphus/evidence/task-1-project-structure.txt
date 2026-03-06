@@ -1,0 +1,15 @@
+src/sublingo/__init__.py
+src/sublingo/__pycache__/__main__.cpython-311.pyc
+src/sublingo/__pycache__/__init__.cpython-311.pyc
+src/sublingo/__main__.py
+src/sublingo/core/__init__.py
+src/sublingo/core/models.py
+src/sublingo/core/constants.py
+src/sublingo/i18n/.gitkeep
+src/sublingo/gui/__init__.py
+tests/__init__.py
+tests/__pycache__/conftest.cpython-311-pytest-8.4.2.pyc
+tests/__pycache__/__init__.cpython-311.pyc
+tests/conftest.py
+fonts/.gitkeep
+glossaries/.gitkeep

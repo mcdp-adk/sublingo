@@ -1,0 +1,11 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+PySide6 6.10.2 -- Qt runtime 6.10.2 -- Qt compiled 6.10.2
+rootdir: /home/joe/sublingo-work
+configfile: pyproject.toml
+testpaths: tests
+plugins: qt-4.5.0, asyncio-0.26.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 0 items
+
+========================= no tests collected in 0.00s ==========================
