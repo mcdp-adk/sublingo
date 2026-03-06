@@ -1,6 +1,6 @@
 [project]
 name = "sublingo"
-version = "0.0.4"
+version = "0.0.5"
 description = "PySide6 desktop tool for YouTube subtitle workflows"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -27,6 +27,12 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+addopts = ["--strict-markers", "-m", "not e2e"]
+markers = [
+    "unit: deterministic local logic tests",
+    "integration: multi-module tests with mocked external boundaries",
+    "e2e: real external dependency tests (network/system)",
+]
 
 [tool.pyright]
 venvPath = "."

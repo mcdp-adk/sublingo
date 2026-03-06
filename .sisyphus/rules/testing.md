@@ -17,7 +17,13 @@ description: "Testing policy: one-to-one function-test mapping and uv-based exec
 - 所有测试执行必须通过 `uv`：
   - `uv run pytest`
 - 提交前最低门槛：
-  - `uv run pytest` 全量通过。
+  - 默认门禁 `uv run pytest` 通过（`pyproject.toml` 中默认排除 `e2e`）。
+- 分层标记必须显式维护：
+  - `unit`：确定性本地逻辑
+  - `integration`：跨模块协作（可替身外部边界）
+  - `e2e`：真实外部依赖烟雾测试
+- 触及网络 / 下载 / 代理 / 外部依赖适配时，提交前额外执行：
+  - `uv run pytest -m e2e -o addopts="--strict-markers"`
 
 ## Failure Policy
 
