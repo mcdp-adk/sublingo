@@ -1,0 +1,1 @@
+- Task 5: auto-generated subtitle detection uses duration, overlap, and words-per-entry heuristics so VTT parsing stays format-agnostic.

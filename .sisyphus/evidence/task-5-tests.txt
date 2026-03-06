@@ -1,0 +1,19 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- /home/joe/sublingo-work/.venv/bin/python
+cachedir: .pytest_cache
+PySide6 6.10.2 -- Qt runtime 6.10.2 -- Qt compiled 6.10.2
+rootdir: /home/joe/sublingo-work
+configfile: pyproject.toml
+plugins: qt-4.5.0, asyncio-0.26.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 7 items
+
+tests/test_subtitle.py::test_parse_vtt_preserves_timestamps_and_text PASSED [ 14%]
+tests/test_subtitle.py::test_parse_srt_preserves_timestamps_and_text PASSED [ 28%]
+tests/test_subtitle.py::test_parse_subtitle_handles_utf8_sig PASSED      [ 42%]
+tests/test_subtitle.py::test_is_auto_generated_detects_word_level_timestamps PASSED [ 57%]
+tests/test_subtitle.py::test_is_auto_generated_keeps_sentence_level_subtitles_manual PASSED [ 71%]
+tests/test_subtitle.py::test_generate_bilingual_ass_contains_both_styles PASSED [ 85%]
+tests/test_subtitle.py::test_ass_output_is_valid_and_can_be_reparsed PASSED [100%]
+
+============================== 7 passed in 0.04s ===============================

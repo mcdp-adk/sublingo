@@ -1,0 +1,1 @@
+- Task 5: subtitle parsing normalizes VTT HTML tags with utf-8-sig input and returns model-layer millisecond timestamps.

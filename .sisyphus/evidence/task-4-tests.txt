@@ -1,0 +1,55 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- /home/joe/sublingo-work/.venv/bin/python
+cachedir: .pytest_cache
+PySide6 6.10.2 -- Qt runtime 6.10.2 -- Qt compiled 6.10.2
+rootdir: /home/joe/sublingo-work
+configfile: pyproject.toml
+plugins: qt-4.5.0, asyncio-0.26.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 43 items
+
+tests/test_config.py::TestAppConfig::test_default_values PASSED          [  2%]
+tests/test_config.py::TestAppConfig::test_field_order PASSED             [  4%]
+tests/test_config.py::TestAppConfig::test_custom_values PASSED           [  6%]
+tests/test_config.py::TestConfigManager::test_init PASSED                [  9%]
+tests/test_config.py::TestConfigManager::test_is_first_run_true PASSED   [ 11%]
+tests/test_config.py::TestConfigManager::test_is_first_run_false PASSED  [ 13%]
+tests/test_config.py::TestConfigManager::test_load_default_config PASSED [ 16%]
+tests/test_config.py::TestConfigManager::test_load_existing_config PASSED [ 18%]
+tests/test_config.py::TestConfigManager::test_load_filters_unknown_fields PASSED [ 20%]
+tests/test_config.py::TestConfigManager::test_load_backward_compat_language PASSED [ 23%]
+tests/test_config.py::TestConfigManager::test_save_config PASSED         [ 25%]
+tests/test_config.py::TestConfigManager::test_save_creates_parent_dirs PASSED [ 27%]
+tests/test_config.py::TestConfigManager::test_save_pretty_format PASSED  [ 30%]
+tests/test_config.py::TestConfigManager::test_save_caches_config PASSED  [ 32%]
+tests/test_config.py::TestConfigManager::test_reset_deletes_config PASSED [ 34%]
+tests/test_config.py::TestConfigManager::test_reset_no_error_if_no_file PASSED [ 37%]
+tests/test_config.py::TestConfigManager::test_get_default PASSED         [ 39%]
+tests/test_config.py::TestConfigManager::test_get_default_unknown_field PASSED [ 41%]
+tests/test_config.py::TestConfigManager::test_resolve_project_dir_relative PASSED [ 44%]
+tests/test_config.py::TestConfigManager::test_resolve_project_dir_absolute PASSED [ 46%]
+tests/test_config.py::TestConfigManager::test_resolve_output_dir_relative PASSED [ 48%]
+tests/test_config.py::TestConfigManager::test_resolve_output_dir_absolute PASSED [ 51%]
+tests/test_config.py::TestConfigManager::test_config_property_lazy_loads PASSED [ 53%]
+tests/test_config.py::TestConfigManager::test_load_updates_cache PASSED  [ 55%]
+tests/test_config.py::TestConfigManager::test_load_returns_fresh_when_no_file PASSED [ 58%]
+tests/test_cookie.py::TestValidateCookieFile::test_file_not_found PASSED [ 60%]
+tests/test_cookie.py::TestValidateCookieFile::test_empty_file PASSED     [ 62%]
+tests/test_cookie.py::TestValidateCookieFile::test_whitespace_only_file PASSED [ 65%]
+tests/test_cookie.py::TestValidateCookieFile::test_valid_netscape_format PASSED [ 67%]
+tests/test_cookie.py::TestValidateCookieFile::test_valid_netscape_single_line PASSED [ 69%]
+tests/test_cookie.py::TestValidateCookieFile::test_valid_json_format PASSED [ 72%]
+tests/test_cookie.py::TestValidateCookieFile::test_valid_json_single_object PASSED [ 74%]
+tests/test_cookie.py::TestValidateCookieFile::test_invalid_netscape_too_few_fields PASSED [ 76%]
+tests/test_cookie.py::TestValidateCookieFile::test_invalid_format PASSED [ 79%]
+tests/test_cookie.py::TestValidateCookieFile::test_invalid_json_not_array PASSED [ 81%]
+tests/test_cookie.py::TestValidateCookieFile::test_invalid_json_empty_array PASSED [ 83%]
+tests/test_cookie.py::TestValidateCookieFile::test_invalid_json_primitives_array PASSED [ 86%]
+tests/test_cookie.py::TestValidateCookieFile::test_binary_file_with_replacement PASSED [ 88%]
+tests/test_cookie.py::TestImportCookieFile::test_import_success PASSED   [ 90%]
+tests/test_cookie.py::TestImportCookieFile::test_import_creates_parent_dirs PASSED [ 93%]
+tests/test_cookie.py::TestImportCookieFile::test_import_overwrites_existing PASSED [ 95%]
+tests/test_cookie.py::TestImportCookieFile::test_import_preserves_metadata PASSED [ 97%]
+tests/test_cookie.py::TestImportCookieFile::test_import_source_not_found PASSED [100%]
+
+============================== 43 passed in 0.05s ==============================
