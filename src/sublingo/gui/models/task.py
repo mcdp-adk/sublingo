@@ -10,7 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from PySide6.QtCore import QObject, QThread, Signal
+from PySide6.QtCore import QObject, QThread, QTimer, Signal
 
 from sublingo.core.config import AppConfig
 from sublingo.core.config import ConfigManager
@@ -31,6 +31,7 @@ STAGE_PENDING: str = "pending"
 STAGE_ACTIVE: str = "active"
 STAGE_DONE: str = "done"
 STAGE_ERROR: str = "error"
+MILLISECONDS_PER_SECOND: int = 1000
 
 
 class TaskType(Enum):
@@ -308,6 +309,7 @@ class TaskManager(QObject):
         self._order = list(self._tasks)
         self._current_worker: _TaskWorker | QObject | None = None
         self._current_task_id: str | None = None
+        self._next_task_timer: QTimer | None = None
 
     @property
     def tasks(self) -> dict[str, TaskInfo]:
@@ -348,7 +350,7 @@ class TaskManager(QObject):
             task.mark_failed(DEFAULT_WORKER_ERROR_MESSAGE)
             self._persist_tasks()
             self.task_failed.emit(task_id, task.error or DEFAULT_WORKER_ERROR_MESSAGE)
-            self._try_run_next()
+            self._schedule_next_task()
             return
 
         task.mark_running()
@@ -519,7 +521,7 @@ class TaskManager(QObject):
             self.task_failed.emit(task_id, error_message)
 
         self._cleanup_worker()
-        self._try_run_next()
+        self._schedule_next_task()
 
     def _on_error(self, task_id: str, exc: object) -> None:
         task = self._tasks.get(task_id)
@@ -537,6 +539,29 @@ class TaskManager(QObject):
         self._persist_tasks()
         self.task_failed.emit(task_id, error_message)
         self._cleanup_worker()
+        self._schedule_next_task()
+
+    def _schedule_next_task(self) -> None:
+        delay_seconds = int(max(self._config_mgr.config.batch_delay_seconds, 0))
+        if delay_seconds == 0:
+            self._try_run_next()
+            return
+
+        if self._next_task_timer is not None and self._next_task_timer.isActive():
+            self._next_task_timer.stop()
+            self._next_task_timer.deleteLater()
+
+        timer = QTimer(self)
+        timer.setSingleShot(True)
+        timer.timeout.connect(self._on_next_task_timer_timeout)
+        timer.start(delay_seconds * MILLISECONDS_PER_SECOND)
+        self._next_task_timer = timer
+
+    def _on_next_task_timer_timeout(self) -> None:
+        timer = self._next_task_timer
+        self._next_task_timer = None
+        if timer is not None:
+            timer.deleteLater()
         self._try_run_next()
 
     def _map_stage_name(

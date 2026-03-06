@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
     QProgressBar,
 )
 
-from sublingo.gui.models.task import TaskManager
+from sublingo.gui.models.task import TaskManager, TaskStatus
 from sublingo.gui.widgets.log_viewer import LogViewer
 from sublingo.gui.widgets.stepper import Stepper
 
@@ -176,6 +176,10 @@ class TasksPage(QWidget):
 
         layout = QVBoxLayout(self)
 
+        self.batch_summary_label = QLabel()
+        self.batch_summary_label.hide()
+        layout.addWidget(self.batch_summary_label)
+
         splitter = QSplitter(Qt.Orientation.Horizontal)
         layout.addWidget(splitter)
 
@@ -215,6 +219,7 @@ class TasksPage(QWidget):
     def _refresh_list(self, *_args: object) -> None:
         self.task_list.clear()
         self._item_widgets.clear()
+        self._update_batch_summary()
 
         for tid in reversed(self._task_mgr.task_order):
             task = self._task_mgr.get_task(tid)
@@ -228,6 +233,22 @@ class TasksPage(QWidget):
             item.setSizeHint(widget.sizeHint())
             self.task_list.setItemWidget(item, widget)
             self._item_widgets[tid] = widget
+
+    def _update_batch_summary(self) -> None:
+        total = len(self._task_mgr.task_order)
+        if total <= 1:
+            self.batch_summary_label.hide()
+            self.batch_summary_label.clear()
+            return
+
+        completed = 0
+        for tid in self._task_mgr.task_order:
+            task = self._task_mgr.get_task(tid)
+            if task is not None and task.status == TaskStatus.COMPLETED:
+                completed += 1
+
+        self.batch_summary_label.setText(f"Batch: {completed}/{total} completed")
+        self.batch_summary_label.show()
 
     def _on_selection_changed(self) -> None:
         items = self.task_list.selectedItems()
@@ -259,8 +280,8 @@ class TasksPage(QWidget):
 
     def _on_continue_clicked(self) -> None:
         # Call resume_workflow if available
-        if (
-            hasattr(self._task_mgr, "resume_workflow")
-            and self.detail_widget._current_task_id
-        ):
-            self._task_mgr.resume_workflow(self.detail_widget._current_task_id)
+        if not self.detail_widget._current_task_id:
+            return
+        resume_workflow = getattr(self._task_mgr, "resume_workflow", None)
+        if callable(resume_workflow):
+            resume_workflow(self.detail_widget._current_task_id)

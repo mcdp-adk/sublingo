@@ -1,0 +1,56 @@
+{
+  "tasks": [
+    {
+      "id": "44e66552",
+      "task_type": "download",
+      "params": {
+        "url": "https://example.com/1"
+      },
+      "status": "running",
+      "created_at": "2026-03-06T05:20:25.474632+00:00",
+      "stages": [
+        "下载"
+      ],
+      "stage_statuses": {
+        "下载": "active"
+      },
+      "current_stage": "下载",
+      "progress_percent": 0,
+      "progress_message": "",
+      "meta": {},
+      "result": null,
+      "error": null,
+      "video_title": ""
+    },
+    {
+      "id": "48dbeb81",
+      "task_type": "workflow",
+      "params": {
+        "url": "https://example.com/2"
+      },
+      "status": "queued",
+      "created_at": "2026-03-06T05:20:25.475108+00:00",
+      "stages": [
+        "下载",
+        "翻译",
+        "字体子集",
+        "软字幕",
+        "转录"
+      ],
+      "stage_statuses": {
+        "下载": "pending",
+        "翻译": "pending",
+        "字体子集": "pending",
+        "软字幕": "pending",
+        "转录": "pending"
+      },
+      "current_stage": "",
+      "progress_percent": 0,
+      "progress_message": "",
+      "meta": {},
+      "result": null,
+      "error": null,
+      "video_title": ""
+    }
+  ]
+}

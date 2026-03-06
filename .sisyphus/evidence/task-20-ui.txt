@@ -1,0 +1,1 @@
+Captured Tasks page with batch summary label visible.

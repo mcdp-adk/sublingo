@@ -43,6 +43,7 @@ class AppConfig:
 
     # Network
     proxy: str = ""  # Empty string means no proxy
+    batch_delay_seconds: int = 0
 
     # GUI
     language: str = "auto"

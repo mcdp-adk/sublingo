@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
-from PySide6.QtCore import QCoreApplication, Qt, Signal
+from PySide6.QtCore import QCoreApplication, QThread, Qt, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -16,7 +19,10 @@ from PySide6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QMessageBox,
+    QProgressDialog,
     QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
     QSizePolicy,
     QStackedWidget,
     QTextEdit,
@@ -26,10 +32,106 @@ from PySide6.QtWidgets import (
 
 from sublingo.core.config import ConfigManager
 from sublingo.core.cookie import validate_cookie_file
-from sublingo.core.downloader import extract_playlist_info
+from sublingo.core.downloader import extract_info, extract_playlist_info
 from sublingo.gui.models.task import TASK_TYPE_DISPLAY, TaskManager, TaskType
 from sublingo.gui.widgets.file_picker import FilePicker
 from sublingo.gui.widgets.form_row import FormRow
+
+_PREVIEW_INCLUDE_COLUMN = 0
+_PREVIEW_TITLE_COLUMN = 1
+_PREVIEW_DURATION_COLUMN = 2
+_PREVIEW_SUBTITLE_COLUMN = 3
+
+
+def _format_duration(seconds: int) -> str:
+    minutes, sec = divmod(max(seconds, 0), 60)
+    hours, minutes = divmod(minutes, 60)
+    if hours > 0:
+        return f"{hours:02}:{minutes:02}:{sec:02}"
+    return f"{minutes:02}:{sec:02}"
+
+
+def _has_subtitles(video: Any) -> bool:
+    subtitles = getattr(video, "available_subtitles", {}) or {}
+    auto_captions = getattr(video, "available_auto_captions", {}) or {}
+    return bool(subtitles or auto_captions)
+
+
+def _is_playlist_url(url: str) -> bool:
+    parsed = urlparse(url)
+    query = parse_qs(parsed.query)
+    if "list" in query:
+        return True
+    return "playlist" in parsed.path.lower()
+
+
+@dataclass
+class PreviewVideoRow:
+    url: str
+    title: str
+    duration: int
+    has_subtitles: bool
+
+
+class _PreviewFetchWorker(QThread):
+    progress = Signal(int, int, str)
+    result_ready = Signal(list)
+    task_error = Signal(str)
+
+    def __init__(
+        self,
+        urls: list[str],
+        *,
+        cookie_file: Path,
+        proxy: str | None,
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self._urls = urls
+        self._cookie_file = cookie_file
+        self._proxy = proxy
+
+    def run(self) -> None:
+        rows: list[PreviewVideoRow] = []
+        total = len(self._urls)
+        try:
+            for index, url in enumerate(self._urls, start=1):
+                if self.isInterruptionRequested():
+                    return
+                self.progress.emit(index, total, url)
+                videos = self._fetch_url(url)
+                for video in videos:
+                    if self.isInterruptionRequested():
+                        return
+                    rows.append(
+                        PreviewVideoRow(
+                            url=getattr(video, "url", "") or url,
+                            title=getattr(video, "title", ""),
+                            duration=int(getattr(video, "duration", 0) or 0),
+                            has_subtitles=_has_subtitles(video),
+                        )
+                    )
+        except Exception as exc:  # noqa: BLE001
+            self.task_error.emit(str(exc))
+            return
+
+        self.result_ready.emit(rows)
+
+    def _fetch_url(self, url: str) -> list[Any]:
+        if _is_playlist_url(url):
+            return extract_playlist_info(
+                url,
+                cookie_file=self._cookie_file,
+                proxy=self._proxy,
+            )
+        return [
+            extract_info(
+                url,
+                cookie_file=self._cookie_file,
+                proxy=self._proxy,
+            )
+        ]
+
 
 # Target languages (shared with settings, but kept local for now).
 _TARGET_LANGUAGES: dict[str, str] = {
@@ -49,19 +151,59 @@ _TARGET_LANGUAGES: dict[str, str] = {
 class PreviewDialog(QDialog):
     """Dialog to preview and confirm videos in a playlist."""
 
-    def __init__(self, videos: list[Any], parent: QWidget | None = None) -> None:
+    def __init__(
+        self, videos: list[PreviewVideoRow], parent: QWidget | None = None
+    ) -> None:
         super().__init__(parent)
-        self.setWindowTitle(self.tr("预览视频列表"))
-        self.resize(600, 400)
+        self.setWindowTitle(self.tr("批处理预览"))
+        self.resize(760, 420)
 
         layout = QVBoxLayout(self)
 
-        self._list = QListWidget()
-        for video in videos:
-            item = QListWidgetItem(f"{video.title} ({video.duration}s)")
-            item.setData(Qt.ItemDataRole.UserRole, video.url)
-            self._list.addItem(item)
-        layout.addWidget(self._list)
+        self._table = QTableWidget(len(videos), 4)
+        self._table.setHorizontalHeaderLabels(
+            [
+                self.tr("包含"),
+                self.tr("标题"),
+                self.tr("时长"),
+                self.tr("字幕可用"),
+            ]
+        )
+        self._table.verticalHeader().setVisible(False)
+        self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
+        self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+
+        for row_index, video in enumerate(videos):
+            include_item = QTableWidgetItem()
+            include_item.setFlags(
+                Qt.ItemFlag.ItemIsEnabled
+                | Qt.ItemFlag.ItemIsSelectable
+                | Qt.ItemFlag.ItemIsUserCheckable
+            )
+            include_item.setCheckState(Qt.CheckState.Checked)
+            include_item.setData(Qt.ItemDataRole.UserRole, video.url)
+            self._table.setItem(row_index, _PREVIEW_INCLUDE_COLUMN, include_item)
+
+            title_item = QTableWidgetItem(video.title or self.tr("未命名视频"))
+            self._table.setItem(row_index, _PREVIEW_TITLE_COLUMN, title_item)
+
+            duration_item = QTableWidgetItem(_format_duration(video.duration))
+            self._table.setItem(row_index, _PREVIEW_DURATION_COLUMN, duration_item)
+
+            subtitle_item = QTableWidgetItem(
+                self.tr("有") if video.has_subtitles else self.tr("无")
+            )
+            self._table.setItem(row_index, _PREVIEW_SUBTITLE_COLUMN, subtitle_item)
+
+        header = self._table.horizontalHeader()
+        header.setStretchLastSection(False)
+        header.resizeSection(_PREVIEW_INCLUDE_COLUMN, 64)
+        header.resizeSection(_PREVIEW_DURATION_COLUMN, 96)
+        header.resizeSection(_PREVIEW_SUBTITLE_COLUMN, 96)
+        header.setSectionResizeMode(_PREVIEW_TITLE_COLUMN, header.ResizeMode.Stretch)
+
+        layout.addWidget(self._table)
 
         btn_box = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -69,6 +211,17 @@ class PreviewDialog(QDialog):
         btn_box.accepted.connect(self.accept)
         btn_box.rejected.connect(self.reject)
         layout.addWidget(btn_box)
+
+    def selected_urls(self) -> list[str]:
+        selected: list[str] = []
+        for row in range(self._table.rowCount()):
+            item = self._table.item(row, _PREVIEW_INCLUDE_COLUMN)
+            if item is None:
+                continue
+            if item.checkState() != Qt.CheckState.Checked:
+                continue
+            selected.append(str(item.data(Qt.ItemDataRole.UserRole) or ""))
+        return [url for url in selected if url]
 
 
 class HomePage(QWidget):
@@ -85,6 +238,8 @@ class HomePage(QWidget):
         super().__init__(parent)
         self._config_mgr = config_mgr
         self._task_mgr = task_mgr
+        self._preview_worker: _PreviewFetchWorker | None = None
+        self._preview_progress: QProgressDialog | None = None
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
@@ -346,6 +501,9 @@ class HomePage(QWidget):
         return [line.strip() for line in text.splitlines() if line.strip()]
 
     def _on_preview(self) -> None:
+        if self._task_mgr is None:
+            return
+
         task_type_value = self._task_type.currentData()
         task_type = TaskType(task_type_value)
         urls = self._get_urls(task_type)
@@ -360,29 +518,93 @@ class HomePage(QWidget):
             QMessageBox.warning(self, self.tr("错误"), self.tr("Cookie 文件无效"))
             return
 
-        all_videos = []
-        try:
-            for url in urls:
-                videos = extract_playlist_info(
-                    url,
-                    cookie_file=self._config_mgr.cookie_file,
-                    proxy=self._config_mgr.config.proxy or None,
-                )
-                all_videos.extend(videos)
-        except Exception as e:
-            QMessageBox.warning(
-                self, self.tr("错误"), self.tr(f"获取视频信息失败: {e}")
-            )
-            return
+        self._start_preview_fetch(task_type, urls)
 
-        if not all_videos:
+    def _start_preview_fetch(self, task_type: TaskType, urls: list[str]) -> None:
+        self._preview_btn.setEnabled(False)
+
+        progress_dialog = QProgressDialog(
+            self.tr("正在获取视频信息..."),
+            self.tr("取消"),
+            0,
+            len(urls),
+            self,
+        )
+        progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+        progress_dialog.setValue(0)
+        progress_dialog.show()
+        self._preview_progress = progress_dialog
+
+        worker = _PreviewFetchWorker(
+            urls,
+            cookie_file=self._config_mgr.cookie_file,
+            proxy=self._config_mgr.config.proxy or None,
+            parent=self,
+        )
+        self._preview_worker = worker
+
+        worker.progress.connect(self._on_preview_fetch_progress)
+        worker.result_ready.connect(
+            lambda rows: self._on_preview_fetch_finished(task_type, rows)
+        )
+        worker.task_error.connect(self._on_preview_fetch_error)
+        worker.finished.connect(self._cleanup_preview_worker)
+
+        progress_dialog.canceled.connect(worker.requestInterruption)
+
+        worker.start()
+
+    def _on_preview_fetch_progress(self, current: int, total: int, url: str) -> None:
+        if self._preview_progress is None:
+            return
+        self._preview_progress.setMaximum(total)
+        self._preview_progress.setValue(current)
+        self._preview_progress.setLabelText(
+            self.tr("正在解析 URL ({current}/{total}):\n{url}").format(
+                current=current,
+                total=total,
+                url=url,
+            )
+        )
+
+    def _on_preview_fetch_finished(
+        self,
+        task_type: TaskType,
+        rows: list[PreviewVideoRow],
+    ) -> None:
+        if not rows:
             QMessageBox.warning(self, self.tr("错误"), self.tr("未找到任何视频"))
             return
 
-        dialog = PreviewDialog(all_videos, self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            # If accepted, we could automatically start the task, but for now just close dialog
-            pass
+        dialog = PreviewDialog(rows, self)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+
+        selected_urls = dialog.selected_urls()
+        if not selected_urls:
+            QMessageBox.warning(self, self.tr("错误"), self.tr("请至少选择一个视频"))
+            return
+
+        self._create_tasks_for_urls(task_type, selected_urls)
+        self.navigate_requested.emit("tasks")
+
+    def _on_preview_fetch_error(self, error_message: str) -> None:
+        QMessageBox.warning(
+            self,
+            self.tr("错误"),
+            self.tr("获取视频信息失败: {error}").format(error=error_message),
+        )
+
+    def _cleanup_preview_worker(self) -> None:
+        self._preview_btn.setEnabled(True)
+        if self._preview_progress is not None:
+            self._preview_progress.close()
+            self._preview_progress.deleteLater()
+            self._preview_progress = None
+        worker = self._preview_worker
+        self._preview_worker = None
+        if worker is not None:
+            worker.deleteLater()
 
     def _on_start(self) -> None:
         if self._task_mgr is None:
@@ -405,11 +627,7 @@ class HomePage(QWidget):
                     self, self.tr("错误"), self.tr("请输入至少一个 URL")
                 )
                 return
-
-            for url in urls:
-                params = self._collect_params(task_type, url)
-                if params is not None:
-                    self._task_mgr.create_task(task_type, params)
+            self._create_tasks_for_urls(task_type, urls)
         else:
             params = self._collect_params(task_type)
             if params is None:
@@ -420,6 +638,14 @@ class HomePage(QWidget):
             self._task_mgr.create_task(task_type, params)
 
         self.navigate_requested.emit("tasks")
+
+    def _create_tasks_for_urls(self, task_type: TaskType, urls: list[str]) -> None:
+        if self._task_mgr is None:
+            return
+        for url in urls:
+            params = self._collect_params(task_type, url)
+            if params is not None:
+                self._task_mgr.create_task(task_type, params)
 
     def _collect_params(self, task_type: TaskType, url: str = "") -> dict | None:
         """Collect parameters from the active form. Returns None if validation fails."""

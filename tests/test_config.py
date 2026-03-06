@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -50,6 +51,7 @@ class TestAppConfig:
 
         # Network
         assert config.proxy == ""
+        assert config.batch_delay_seconds == 0
 
         # GUI
         assert config.language == "auto"
@@ -75,6 +77,7 @@ class TestAppConfig:
             "ai_segment_batch_size",
             "ai_max_retries",
             "proxy",
+            "batch_delay_seconds",
             "language",
             "debug_mode",
         ]
@@ -107,7 +110,7 @@ class TestConfigManager:
     """Tests for ConfigManager class."""
 
     @pytest.fixture
-    def temp_dir(self) -> Path:
+    def temp_dir(self) -> Iterator[Path]:
         """Provide a temporary directory."""
         with tempfile.TemporaryDirectory() as tmp:
             yield Path(tmp)
