@@ -23,7 +23,11 @@ class SetupWizard(QWizard):
         self.setWizardStyle(QWizard.WizardStyle.ModernStyle)
 
         self.lang_page = LanguagePage()
-        self.ai_page = AIConfigPage()
+        self.ai_page = AIConfigPage(
+            default_provider=self._config_mgr.get_default("ai_provider") or "custom",
+            default_base_url=self._config_mgr.get_default("ai_base_url") or "",
+            default_model=self._config_mgr.get_default("ai_model") or "",
+        )
         self.other_page = OtherSettingsPage(config_mgr)
 
         self.addPage(self.lang_page)

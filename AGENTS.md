@@ -1,4 +1,4 @@
-# Agent Working Agreement（sublingo）
+# Agent Working Agreement - sublingo
 
 本文件定义本仓库内 AI / 开发代理的最低执行标准。
 
@@ -17,8 +17,8 @@
   - `uv run python -m <module>`
 - 原则上禁止调用项目外运行时或外部二进制依赖。
 - 例外：允许使用在 `pyproject.toml` 中声明并由 `uv` 管理的二进制能力：
-  - `yt-dlp[default]`（提供 `yt-dlp`）
-  - `static-ffmpeg`（提供 `ffmpeg`、`ffprobe`）
+  - `yt-dlp[default]`，提供 `yt-dlp`
+  - `static-ffmpeg`，提供 `ffmpeg`、`ffprobe`
 - `deno` 作为 `yt-dlp` EJS 能力所需系统依赖，允许作为运行前置条件，但不通过 `pip`/系统 Python 单独安装项目 Python 依赖。
 - 禁止直接使用系统 `python` / `pip` / `pytest` 执行项目任务。
 
@@ -42,9 +42,10 @@
 - 未经明确请求，禁止执行 `git commit`、`git push`、`git rebase`。
 - 提交前必须完成并通过 `uv run pytest`。
 - 提交前必须执行 `git status` 确认所有变更文件已 staged，禁止遗漏任何变更。
-- 禁止提交敏感信息（如密钥、凭据、`.env`）。
+- 若修改 `pyproject.toml` 中版本号，提交前必须执行 `uv sync`，确保锁文件与环境元数据已同步，避免后续运行产生额外改动。
+- 禁止提交敏感信息，例如密钥、凭据、`.env`。
 - 禁止对 `main` / `master` 执行 `--force` 推送。
-- 禁止在无明确要求时使用破坏性命令（如 `reset --hard`）。
+- 禁止在无明确要求时使用破坏性命令，例如 `reset --hard`。
 
 ## 5. Completion Standard
 

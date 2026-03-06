@@ -43,9 +43,6 @@ AI_PROOFREADING_CONTEXT_SIZE: int = 3  # 校对上下文大小
 # 语言检测
 AI_LANGUAGE_DETECT_SAMPLE_LENGTH: int = 2000  # 语言检测样本长度
 
-# 默认模型
-AI_DEFAULT_MODEL: str = "gemini-2.5-flash-preview"
-
 # ---------------------------------------------------------------------------
 # 字幕常量
 # ---------------------------------------------------------------------------
@@ -114,21 +111,3 @@ FFMPEG_FFMPEG_TIMEOUT_S: int = 600  # ffmpeg 超时（秒，10 分钟）
 
 # 错误输出截断
 FFMPEG_ERROR_TRUNCATE_LENGTH: int = 500  # 错误输出截断长度
-
-# ---------------------------------------------------------------------------
-# 配置默认值
-# ---------------------------------------------------------------------------
-
-CONFIG_DEFAULT_FONT: str = "LXGWWenKai-Medium.ttf"  # 默认字体
-
-# AI 提供商默认 API 地址
-CONFIG_DEFAULT_API_BASE_OPENAI: str = "https://api.openai.com/v1"
-CONFIG_DEFAULT_API_BASE_ANTHROPIC: str = "https://api.anthropic.com/v1"
-CONFIG_DEFAULT_API_BASE_GEMINI: str = "https://generativelanguage.googleapis.com/v1beta"
-
-# AI 提供商预设: provider_name -> (base_url, default_model)
-AI_PROVIDER_PRESETS: dict[str, tuple[str, str]] = {
-    "openai": (CONFIG_DEFAULT_API_BASE_OPENAI, "gpt-4o-mini"),
-    "anthropic": (CONFIG_DEFAULT_API_BASE_ANTHROPIC, "claude-3-5-sonnet-20241022"),
-    "gemini": (CONFIG_DEFAULT_API_BASE_GEMINI, AI_DEFAULT_MODEL),
-}

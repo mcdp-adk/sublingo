@@ -349,6 +349,11 @@ def _find_subtitle_path(project_dir: Path) -> Path | None:
 def _find_translated_ass(project_dir: Path, target_lang: str) -> Path | None:
     if not project_dir.exists():
         return None
+    if target_lang == "auto":
+        for path in sorted(project_dir.glob(f"*{ASS_EXTENSION}")):
+            if path.is_file():
+                return path
+        return None
     lang_token = f".{target_lang}."
     for path in sorted(project_dir.glob(f"*{ASS_EXTENSION}")):
         if path.is_file() and lang_token in path.name:

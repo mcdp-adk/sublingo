@@ -13,13 +13,24 @@ from PySide6.QtWidgets import (
 )
 
 from sublingo.gui.config_options import AI_PROVIDER_PRESETS
+from sublingo.gui.config_options import format_provider_label
 from sublingo.gui.widgets.ai_settings_widget import TestConnectionWorker
 
 
 class AIConfigPage(QWizardPage):
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        default_provider: str,
+        default_base_url: str,
+        default_model: str,
+        parent: QWidget | None = None,
+    ) -> None:
         super().__init__(parent)
         self._workers: list[TestConnectionWorker] = []
+        self._default_provider = default_provider
+        self._default_base_url = default_base_url
+        self._default_model = default_model
         self.setTitle(self.tr("AI Configuration"))
         self.setSubTitle(self.tr("Configure AI provider and API key."))
 
@@ -29,7 +40,7 @@ class AIConfigPage(QWizardPage):
 
         self.ai_provider = QComboBox()
         for key in AI_PROVIDER_PRESETS:
-            self.ai_provider.addItem(key.capitalize(), key)
+            self.ai_provider.addItem(format_provider_label(key), key)
         self.ai_provider.currentIndexChanged.connect(self._on_provider_changed)
         layout.addWidget(self.ai_provider)
 
@@ -56,7 +67,18 @@ class AIConfigPage(QWizardPage):
         button_row.addStretch(1)
         layout.addLayout(button_row)
         layout.addStretch(1)
+
+        default_index = self.ai_provider.findData(self._default_provider)
+        if default_index >= 0:
+            self.ai_provider.setCurrentIndex(default_index)
+        else:
+            custom_index = self.ai_provider.findData("custom")
+            if custom_index >= 0:
+                self.ai_provider.setCurrentIndex(custom_index)
+
         self._on_provider_changed(0)
+        self.ai_base_url.setText(self._default_base_url)
+        self.ai_model.setText(self._default_model)
 
     def retranslateUi(self) -> None:
         self.setTitle(self.tr("AI Configuration"))

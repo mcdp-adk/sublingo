@@ -51,7 +51,8 @@ class OtherSettingsPage(QWizardPage):
         self._output_label = QLabel(self.tr("Output Directory:"))
         layout.addWidget(self._output_label)
         self.output_dir = FilePicker(mode="directory")
-        self.output_dir.set_path("./output")
+        default_output_dir = self._config_mgr.get_default("output_dir")
+        self.output_dir.set_path(str(default_output_dir or ""))
         layout.addWidget(self.output_dir)
 
         self._proxy_label = QLabel(self.tr("Proxy:"))

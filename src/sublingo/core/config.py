@@ -8,12 +8,39 @@ from pathlib import Path
 from typing import Any
 
 from sublingo.core.constants import (
-    AI_DEFAULT_MODEL,
     AI_MAX_RETRIES,
+    AI_PROOFREADING_BATCH_SIZE,
     AI_TRANSLATION_BATCH_SIZE,
-    CONFIG_DEFAULT_API_BASE_GEMINI,
-    CONFIG_DEFAULT_FONT,
 )
+
+DEFAULT_PROJECT_DIR: str = "./output"
+DEFAULT_OUTPUT_DIR: str = "./output"
+DEFAULT_TARGET_LANGUAGE: str = "auto"
+DEFAULT_GENERATE_TRANSCRIPT: bool = False
+DEFAULT_FONT_FILE: str = "LXGWWenKai-Medium.ttf"
+DEFAULT_AI_PROVIDER: str = "openai"
+DEFAULT_AI_BASE_URL: str = "https://api.openai.com/v1"
+DEFAULT_AI_MODEL: str = "gpt-5-mini"
+DEFAULT_AI_API_KEY: str = ""
+DEFAULT_AI_TRANSLATE_BATCH_SIZE: int = AI_TRANSLATION_BATCH_SIZE
+DEFAULT_AI_PROOFREAD_BATCH_SIZE: int = AI_PROOFREADING_BATCH_SIZE
+DEFAULT_AI_SEGMENT_BATCH_SIZE: int = AI_TRANSLATION_BATCH_SIZE
+DEFAULT_AI_MAX_RETRIES: int = AI_MAX_RETRIES
+DEFAULT_PROXY: str = ""
+DEFAULT_BATCH_DELAY_SECONDS: int = 0
+DEFAULT_GUI_LANGUAGE: str = "auto"
+DEFAULT_DEBUG_MODE: bool = False
+
+AI_PROVIDER_PRESETS: dict[str, tuple[str, str]] = {
+    "openai": ("https://api.openai.com/v1", "gpt-5-mini"),
+    "gemini": (
+        "https://generativelanguage.googleapis.com/v1beta/openai",
+        "gemini-flash-latest",
+    ),
+    "deepseek": ("https://api.deepseek.com/v1", "deepseek-chat"),
+    "openrouter": ("https://openrouter.ai/api/v1", "openrouter/auto"),
+    "custom": ("", ""),
+}
 
 
 @dataclass
@@ -21,33 +48,33 @@ class AppConfig:
     """Application configuration with sensible defaults."""
 
     # Output paths
-    project_dir: str = "./output"
-    output_dir: str = "./output"
+    project_dir: str = DEFAULT_PROJECT_DIR
+    output_dir: str = DEFAULT_OUTPUT_DIR
 
     # Translation
-    target_language: str = "zh-Hans"
-    generate_transcript: bool = False
+    target_language: str = DEFAULT_TARGET_LANGUAGE
+    generate_transcript: bool = DEFAULT_GENERATE_TRANSCRIPT
 
     # Font
-    font_file: str = CONFIG_DEFAULT_FONT
+    font_file: str = DEFAULT_FONT_FILE
 
     # AI settings
-    ai_provider: str = "gemini"
-    ai_base_url: str = CONFIG_DEFAULT_API_BASE_GEMINI
-    ai_model: str = AI_DEFAULT_MODEL
-    ai_api_key: str = ""
-    ai_translate_batch_size: int = 20
-    ai_proofread_batch_size: int = AI_TRANSLATION_BATCH_SIZE
-    ai_segment_batch_size: int = AI_TRANSLATION_BATCH_SIZE
-    ai_max_retries: int = AI_MAX_RETRIES
+    ai_provider: str = DEFAULT_AI_PROVIDER
+    ai_base_url: str = DEFAULT_AI_BASE_URL
+    ai_model: str = DEFAULT_AI_MODEL
+    ai_api_key: str = DEFAULT_AI_API_KEY
+    ai_translate_batch_size: int = DEFAULT_AI_TRANSLATE_BATCH_SIZE
+    ai_proofread_batch_size: int = DEFAULT_AI_PROOFREAD_BATCH_SIZE
+    ai_segment_batch_size: int = DEFAULT_AI_SEGMENT_BATCH_SIZE
+    ai_max_retries: int = DEFAULT_AI_MAX_RETRIES
 
     # Network
-    proxy: str = ""  # Empty string means no proxy
-    batch_delay_seconds: int = 0
+    proxy: str = DEFAULT_PROXY  # Empty string means no proxy
+    batch_delay_seconds: int = DEFAULT_BATCH_DELAY_SECONDS
 
     # GUI
-    language: str = "auto"
-    debug_mode: bool = False
+    language: str = DEFAULT_GUI_LANGUAGE
+    debug_mode: bool = DEFAULT_DEBUG_MODE
 
 
 # Backward compatibility mapping for old language codes

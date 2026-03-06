@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sublingo.gui.config_options import format_language_option_label
 from sublingo.gui.config_options import GUI_LANGUAGES
 from sublingo.gui.config_options import TARGET_LANGUAGES
 from sublingo.gui.widgets.file_picker import FilePicker
@@ -33,7 +34,7 @@ class GUISettingsWidget(SettingsSection):
         super().__init__("GUI", parent)
         self.gui_language = QComboBox()
         for code, name in GUI_LANGUAGES.items():
-            label = f"{name}" if code == "auto" else f"{name} ({code})"
+            label = format_language_option_label(code, name, self.tr)
             self.gui_language.addItem(label, code)
         self.add_row(
             row_builder(self.tr("Interface Language:"), self.gui_language, "language")
@@ -50,7 +51,10 @@ class TranslationSettingsWidget(SettingsSection):
         super().__init__(self.tr("Translation"), parent)
         self.target_language = QComboBox()
         for code, name in TARGET_LANGUAGES.items():
-            self.target_language.addItem(f"{name} ({code})", code)
+            self.target_language.addItem(
+                format_language_option_label(code, name, self.tr),
+                code,
+            )
         self.add_row(
             row_builder(self.tr("目标语言:"), self.target_language, "target_language")
         )

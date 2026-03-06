@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 )
 
 from sublingo.gui.config_options import AI_PROVIDER_PRESETS
+from sublingo.gui.config_options import format_provider_label
 from sublingo.gui.widgets.settings_section import SettingsSection
 
 
@@ -58,7 +59,7 @@ class AISettingsWidget(SettingsSection):
         super().__init__(self.tr("AI"), parent)
         self.ai_provider = QComboBox()
         for key in AI_PROVIDER_PRESETS:
-            self.ai_provider.addItem(key.capitalize(), key)
+            self.ai_provider.addItem(format_provider_label(key), key)
         self.add_row(row_builder(self.tr("Provider:"), self.ai_provider, "ai_provider"))
 
         self.ai_base_url = QLineEdit()

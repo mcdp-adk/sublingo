@@ -9,13 +9,18 @@ from pathlib import Path
 
 import pytest
 
-from sublingo.core.config import AppConfig, ConfigManager
+from sublingo.core.config import (
+    AppConfig,
+    ConfigManager,
+    DEFAULT_AI_BASE_URL,
+    DEFAULT_AI_MODEL,
+    DEFAULT_AI_PROVIDER,
+    DEFAULT_FONT_FILE,
+)
 from sublingo.core.constants import (
-    AI_DEFAULT_MODEL,
     AI_MAX_RETRIES,
+    AI_PROOFREADING_BATCH_SIZE,
     AI_TRANSLATION_BATCH_SIZE,
-    CONFIG_DEFAULT_API_BASE_GEMINI,
-    CONFIG_DEFAULT_FONT,
 )
 
 
@@ -31,21 +36,21 @@ class TestAppConfig:
         assert config.output_dir == "./output"
 
         # Translation
-        assert config.target_language == "zh-Hans"
+        assert config.target_language == "auto"
         assert config.generate_transcript is False
 
         # Font
-        assert config.font_file == CONFIG_DEFAULT_FONT
+        assert config.font_file == DEFAULT_FONT_FILE
         assert config.font_file == "LXGWWenKai-Medium.ttf"
 
         # AI settings
-        assert config.ai_provider == "gemini"
-        assert config.ai_base_url == CONFIG_DEFAULT_API_BASE_GEMINI
-        assert config.ai_model == AI_DEFAULT_MODEL
-        assert config.ai_model == "gemini-2.5-flash-preview"
+        assert config.ai_provider == DEFAULT_AI_PROVIDER
+        assert config.ai_base_url == DEFAULT_AI_BASE_URL
+        assert config.ai_model == DEFAULT_AI_MODEL
+        assert config.ai_model == "gpt-5-mini"
         assert config.ai_api_key == ""
-        assert config.ai_translate_batch_size == 20
-        assert config.ai_proofread_batch_size == AI_TRANSLATION_BATCH_SIZE
+        assert config.ai_translate_batch_size == AI_TRANSLATION_BATCH_SIZE
+        assert config.ai_proofread_batch_size == AI_PROOFREADING_BATCH_SIZE
         assert config.ai_segment_batch_size == AI_TRANSLATION_BATCH_SIZE
         assert config.ai_max_retries == AI_MAX_RETRIES
 
@@ -140,8 +145,8 @@ class TestConfigManager:
         """Test loading when config file doesn't exist returns defaults."""
         config = manager.load()
         assert isinstance(config, AppConfig)
-        assert config.ai_provider == "gemini"
-        assert config.target_language == "zh-Hans"
+        assert config.ai_provider == "openai"
+        assert config.target_language == "auto"
 
     def test_load_existing_config(self, manager: ConfigManager) -> None:
         """Test loading existing config file."""
@@ -157,7 +162,7 @@ class TestConfigManager:
         assert config.target_language == "en"
         assert config.generate_transcript is True
         # Other fields should be defaults
-        assert config.ai_model == AI_DEFAULT_MODEL
+        assert config.ai_model == DEFAULT_AI_MODEL
 
     def test_load_filters_unknown_fields(self, manager: ConfigManager) -> None:
         """Test that unknown fields are filtered out."""
@@ -245,8 +250,8 @@ class TestConfigManager:
 
     def test_get_default(self, manager: ConfigManager) -> None:
         """Test getting default values."""
-        assert manager.get_default("ai_provider") == "gemini"
-        assert manager.get_default("target_language") == "zh-Hans"
+        assert manager.get_default("ai_provider") == DEFAULT_AI_PROVIDER
+        assert manager.get_default("target_language") == "auto"
         assert manager.get_default("ai_max_retries") == AI_MAX_RETRIES
 
     def test_get_default_unknown_field(self, manager: ConfigManager) -> None:

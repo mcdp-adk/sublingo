@@ -234,4 +234,32 @@
         <translation>取消</translation>
     </message>
 </context>
+<context>
+    <name>GUISettingsWidget</name>
+    <message>
+        <source>System Language</source>
+        <translation>系统语言</translation>
+    </message>
+</context>
+<context>
+    <name>HomeTaskForms</name>
+    <message>
+        <source>System Language</source>
+        <translation>系统语言</translation>
+    </message>
+</context>
+<context>
+    <name>LanguagePage</name>
+    <message>
+        <source>System Language</source>
+        <translation>系统语言</translation>
+    </message>
+</context>
+<context>
+    <name>TranslationSettingsWidget</name>
+    <message>
+        <source>System Language</source>
+        <translation>系统语言</translation>
+    </message>
+</context>
 </TS>

@@ -5,6 +5,7 @@ from pathlib import Path
 from PySide6.QtWidgets import QCheckBox, QComboBox, QSizePolicy, QVBoxLayout, QWidget
 
 from sublingo.core.config import ConfigManager
+from sublingo.gui.config_options import format_language_option_label
 from sublingo.gui.config_options import TARGET_LANGUAGES
 from sublingo.gui.models.task_types import TaskType
 from sublingo.gui.widgets.file_picker import FilePicker
@@ -191,7 +192,7 @@ class HomeTaskForms(QWidget):
     def _build_language_combo(self) -> QComboBox:
         combo = QComboBox()
         for code, name in TARGET_LANGUAGES.items():
-            combo.addItem(f"{name} ({code})", code)
+            combo.addItem(format_language_option_label(code, name, self.tr), code)
         return combo
 
     def _build_video_picker(self) -> FilePicker:

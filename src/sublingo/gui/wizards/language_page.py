@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QComboBox, QLabel, QVBoxLayout, QWidget, QWizardPage
 
+from sublingo.gui.config_options import format_language_option_label
 from sublingo.gui.config_options import GUI_LANGUAGES
 from sublingo.gui.config_options import TARGET_LANGUAGES
-from sublingo.gui.i18n_utils import detect_system_language
 
 
 class LanguagePage(QWizardPage):
@@ -21,7 +21,7 @@ class LanguagePage(QWizardPage):
 
         self.gui_language = QComboBox()
         for code, name in GUI_LANGUAGES.items():
-            label = f"{name}" if code == "auto" else f"{name} ({code})"
+            label = format_language_option_label(code, name, self.tr)
             self.gui_language.addItem(label, code)
         layout.addWidget(self.gui_language)
 
@@ -30,12 +30,14 @@ class LanguagePage(QWizardPage):
 
         self.target_language = QComboBox()
         for code, name in TARGET_LANGUAGES.items():
-            self.target_language.addItem(f"{name} ({code})", code)
+            self.target_language.addItem(
+                format_language_option_label(code, name, self.tr),
+                code,
+            )
         layout.addWidget(self.target_language)
 
-        system_language = detect_system_language()
-        self._set_default_language(self.gui_language, system_language, fallback="auto")
-        self._set_default_language(self.target_language, system_language)
+        self._set_default_language(self.gui_language, "auto")
+        self._set_default_language(self.target_language, "auto")
         layout.addStretch(1)
 
     def retranslateUi(self) -> None:
