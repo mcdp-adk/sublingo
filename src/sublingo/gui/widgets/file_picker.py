@@ -30,12 +30,14 @@ class FilePicker(QWidget):
 
         self._line_edit = QLineEdit()
         self._line_edit.setPlaceholderText(
-            self.tr("选择文件…") if mode == "file" else self.tr("选择目录…")
+            self.tr("Select a file...")
+            if mode == "file"
+            else self.tr("Select a directory...")
         )
         self._line_edit.textChanged.connect(self._on_text_changed)
         layout.addWidget(self._line_edit, stretch=1)
 
-        self._browse_btn = QPushButton(self.tr("浏览…"))
+        self._browse_btn = QPushButton(self.tr("Browse..."))
         self._browse_btn.clicked.connect(self._on_browse)
         layout.addWidget(self._browse_btn)
 
@@ -52,12 +54,12 @@ class FilePicker(QWidget):
         if self._mode == "directory":
             path = QFileDialog.getExistingDirectory(
                 self,
-                self.tr("选择目录"),
+                self.tr("Select Directory"),
             )
         else:
             path, _ = QFileDialog.getOpenFileName(
                 self,
-                self.tr("选择文件"),
+                self.tr("Select File"),
                 "",
                 self._filter,
             )

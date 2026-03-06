@@ -9,7 +9,9 @@ from PySide6.QtCore import QCoreApplication, QObject, Signal
 from sublingo.core.config import ConfigManager
 from sublingo.core.models import DownloadResult
 from sublingo.gui.models.task import TaskManager
+from sublingo.gui.models.task_info import format_task_title
 from sublingo.gui.models.task_info import TaskInfo
+from sublingo.gui.models.task_types import format_task_type_label
 from sublingo.gui.models.task_types import TASK_STAGES
 from sublingo.gui.models.task_types import TaskStatus
 from sublingo.gui.models.task_types import TaskType
@@ -91,6 +93,41 @@ def test_task_info_state_transitions() -> None:
     assert completed.status == TaskStatus.COMPLETED
     assert completed.progress_percent == 100
     assert completed.stage_statuses == {"Download": "done"}
+
+
+def test_task_type_label_formats_match_scope_rules() -> None:
+    identity = lambda text: text
+
+    assert (
+        format_task_type_label(TaskType.DOWNLOAD, identity, is_batch=False)
+        == "Module: Download"
+    )
+    assert (
+        format_task_type_label(TaskType.DOWNLOAD, identity, is_batch=True)
+        == "Module: Download"
+    )
+    assert (
+        format_task_type_label(TaskType.WORKFLOW, identity, is_batch=False)
+        == "Workflow: Single"
+    )
+    assert (
+        format_task_type_label(TaskType.WORKFLOW, identity, is_batch=True)
+        == "Workflow: Batch"
+    )
+
+
+def test_task_title_uses_workflow_batch_mode_when_batch_metadata_present() -> None:
+    identity = lambda text: text
+    single = TaskInfo(
+        task_type=TaskType.WORKFLOW, params={"url": "https://example.com"}
+    )
+    batch = TaskInfo(
+        task_type=TaskType.WORKFLOW,
+        params={"url": "https://example.com", "batch_total": 3, "batch_index": 2},
+    )
+
+    assert format_task_title(single, identity).startswith("Workflow: Single")
+    assert format_task_title(batch, identity).startswith("Workflow: Batch")
 
 
 def test_task_manager_create_queue_and_run_lifecycle(

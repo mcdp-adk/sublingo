@@ -76,7 +76,7 @@ class AISettingsWidget(SettingsSection):
         self.ai_segment_batch_size.setRange(1, 200)
         self.add_row(
             row_builder(
-                self.tr("断句批次:"),
+                self.tr("Segmentation Batch Size:"),
                 self.ai_segment_batch_size,
                 "ai_segment_batch_size",
             )
@@ -86,7 +86,7 @@ class AISettingsWidget(SettingsSection):
         self.ai_translate_batch_size.setRange(1, 200)
         self.add_row(
             row_builder(
-                self.tr("翻译批次:"),
+                self.tr("Translation Batch Size:"),
                 self.ai_translate_batch_size,
                 "ai_translate_batch_size",
             )
@@ -96,7 +96,7 @@ class AISettingsWidget(SettingsSection):
         self.ai_proofread_batch_size.setRange(1, 200)
         self.add_row(
             row_builder(
-                self.tr("校对批次:"),
+                self.tr("Proofreading Batch Size:"),
                 self.ai_proofread_batch_size,
                 "ai_proofread_batch_size",
             )
@@ -106,14 +106,14 @@ class AISettingsWidget(SettingsSection):
         self.ai_max_retries.setRange(0, 20)
         self.add_row(
             row_builder(
-                self.tr("最大重试:"),
+                self.tr("Max Retries:"),
                 self.ai_max_retries,
                 "ai_max_retries",
             )
         )
 
         button_row = QHBoxLayout()
-        self.test_conn_btn = QPushButton(self.tr("测试连接"))
+        self.test_conn_btn = QPushButton(self.tr("Test Connection"))
         button_row.addWidget(self.test_conn_btn)
         button_row.addStretch(1)
         self.section_layout.addLayout(button_row)

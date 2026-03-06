@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -11,7 +12,7 @@ from sublingo.gui.models.task_types import STAGE_DONE
 from sublingo.gui.models.task_types import STAGE_ERROR
 from sublingo.gui.models.task_types import STAGE_PENDING
 from sublingo.gui.models.task_types import TASK_STAGES
-from sublingo.gui.models.task_types import TASK_TYPE_DISPLAY
+from sublingo.gui.models.task_types import format_task_type_label
 from sublingo.gui.models.task_types import TaskStatus
 from sublingo.gui.models.task_types import TaskType
 
@@ -33,6 +34,54 @@ def describe_task(task: "TaskInfo") -> str:
             return value
         return Path(value).name
     return ""
+
+
+def _as_positive_int(value: Any, fallback: int) -> int:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return fallback
+    return parsed if parsed > 0 else fallback
+
+
+def get_batch_total(task: "TaskInfo") -> int:
+    return _as_positive_int(task.params.get("batch_total"), 1)
+
+
+def get_batch_index(task: "TaskInfo") -> int:
+    return _as_positive_int(task.params.get("batch_index"), 1)
+
+
+def is_batch_task(task: "TaskInfo") -> bool:
+    return get_batch_total(task) > 1
+
+
+def format_task_title(task: "TaskInfo", translator: Callable[[str], str]) -> str:
+    title = format_task_type_label(
+        task.task_type,
+        translator,
+        is_batch=is_batch_task(task),
+    )
+    suffix = task.video_title or describe_task(task)
+    if not suffix:
+        return title
+    return f"{title}  {suffix}"
+
+
+def format_status_summary(task: "TaskInfo", translator: Callable[[str], str]) -> str:
+    if task.status == TaskStatus.COMPLETED:
+        return translator("Completed")
+    if task.status == TaskStatus.FAILED:
+        return translator("Failed")
+    if task.status == TaskStatus.RUNNING and task.current_stage:
+        stage = translator(task.current_stage)
+        if task.progress_percent > 0:
+            return translator("{stage} {percent}%").format(
+                stage=stage,
+                percent=task.progress_percent,
+            )
+        return stage
+    return translator("Queued")
 
 
 @dataclass
@@ -65,7 +114,11 @@ class TaskInfo:
 
     @property
     def display_name(self) -> str:
-        task_name = TASK_TYPE_DISPLAY.get(self.task_type, "Task")
+        task_name = format_task_type_label(
+            self.task_type,
+            lambda text: text,
+            is_batch=is_batch_task(self),
+        )
         suffix = self.video_title or describe_task(self)
         if not suffix:
             return task_name

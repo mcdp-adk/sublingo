@@ -109,7 +109,7 @@ class SettingsPage(QWidget):
         row = FormRow(label_text, widget)
         reset_btn = QPushButton("R")
         reset_btn.setFixedSize(28, 28)
-        reset_btn.setToolTip(self.tr("重置为默认值"))
+        reset_btn.setToolTip(self.tr("Reset to default"))
         reset_btn.clicked.connect(
             lambda checked=False, key=config_key: self._reset_field(key)
         )
@@ -275,8 +275,8 @@ class SettingsPage(QWidget):
         if config_key == "language" and value != old_value:
             QMessageBox.information(
                 self,
-                self.tr("提示"),
-                self.tr("界面语言已保存，重启应用后生效。"),
+                self.tr("Info"),
+                self.tr("Interface language saved. Restart the app to apply changes."),
             )
         if config_key == "debug_mode" and value != old_value:
             self.debug_mode_changed.emit(bool(value))
@@ -310,7 +310,7 @@ class SettingsPage(QWidget):
 
     def _on_test_connection(self) -> None:
         self._ai_section.test_conn_btn.setEnabled(False)
-        self._ai_section.test_conn_btn.setText(self.tr("测试中…"))
+        self._ai_section.test_conn_btn.setText(self.tr("Testing..."))
         worker = TestConnectionWorker(
             base_url=self._ai_section.ai_base_url.text(),
             api_key=self._ai_section.ai_api_key.text(),
@@ -323,11 +323,11 @@ class SettingsPage(QWidget):
 
     def _on_test_connection_result(self, success: bool, message: str) -> None:
         self._ai_section.test_conn_btn.setEnabled(True)
-        self._ai_section.test_conn_btn.setText(self.tr("测试连接"))
+        self._ai_section.test_conn_btn.setText(self.tr("Test Connection"))
         if success:
-            QMessageBox.information(self, self.tr("连接成功"), message)
+            QMessageBox.information(self, self.tr("Connection Successful"), message)
         else:
-            QMessageBox.warning(self, self.tr("连接失败"), message)
+            QMessageBox.warning(self, self.tr("Connection Failed"), message)
 
     def _on_import_cookie(self) -> None:
         source = self._cookie_section.cookie_import_picker.path().strip()
@@ -335,41 +335,49 @@ class SettingsPage(QWidget):
             return
         import_cookie_file(Path(source), self._config_mgr.cookie_file)
         self._update_cookie_status()
-        QMessageBox.information(self, self.tr("导入成功"), self.tr("Cookie 文件已更新"))
+        QMessageBox.information(
+            self,
+            self.tr("Import Successful"),
+            self.tr("Cookie file updated"),
+        )
 
     def _on_validate_cookie(self) -> None:
         ok, message = validate_cookie_file(self._config_mgr.cookie_file)
         if ok:
-            QMessageBox.information(self, self.tr("验证通过"), message)
+            QMessageBox.information(self, self.tr("Validation Passed"), message)
         else:
-            QMessageBox.warning(self, self.tr("验证失败"), message)
+            QMessageBox.warning(self, self.tr("Validation Failed"), message)
         self._update_cookie_status()
 
     def _update_cookie_status(self) -> None:
         cookie = self._config_mgr.cookie_file
         if not cookie.exists() or cookie.stat().st_size == 0:
-            self._cookie_section.cookie_status.setText(self.tr("Cookie 状态: 未导入"))
+            self._cookie_section.cookie_status.setText(
+                self.tr("Cookie status: not imported")
+            )
             self._cookie_section.cookie_status.setStyleSheet("color: #E5C07B;")
             return
         ok, message = validate_cookie_file(cookie)
         if ok:
             self._cookie_section.cookie_status.setText(
-                self.tr("Cookie 状态: {} ({} 字节)").format(
+                self.tr("Cookie status: {} ({} bytes)").format(
                     message, cookie.stat().st_size
                 )
             )
             self._cookie_section.cookie_status.setStyleSheet("color: #98C379;")
         else:
             self._cookie_section.cookie_status.setText(
-                self.tr("Cookie 状态: {}").format(message)
+                self.tr("Cookie status: {}").format(message)
             )
             self._cookie_section.cookie_status.setStyleSheet("color: #E06C75;")
 
     def _on_reset_all(self) -> None:
         reply = QMessageBox.question(
             self,
-            self.tr("确认重置"),
-            self.tr("确定要重置所有设置吗？这将删除 config.json 并需要重启应用。"),
+            self.tr("Confirm Reset"),
+            self.tr(
+                "Reset all settings? This will delete config.json and requires restarting the app."
+            ),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
@@ -377,6 +385,8 @@ class SettingsPage(QWidget):
             self._config_mgr.reset()
             QMessageBox.information(
                 self,
-                self.tr("已重置"),
-                self.tr("设置已重置，请重启应用以生效。"),
+                self.tr("Reset Complete"),
+                self.tr(
+                    "Settings reset complete. Please restart the app to apply changes."
+                ),
             )

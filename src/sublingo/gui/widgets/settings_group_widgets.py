@@ -31,7 +31,7 @@ def scan_font_files(project_root: Path) -> list[str]:
 
 class GUISettingsWidget(SettingsSection):
     def __init__(self, row_builder: RowBuilder, parent: QWidget | None = None) -> None:
-        super().__init__("GUI", parent)
+        super().__init__(self.tr("GUI"), parent)
         self.gui_language = QComboBox()
         for code, name in GUI_LANGUAGES.items():
             label = format_language_option_label(code, name, self.tr)
@@ -56,21 +56,25 @@ class TranslationSettingsWidget(SettingsSection):
                 code,
             )
         self.add_row(
-            row_builder(self.tr("目标语言:"), self.target_language, "target_language")
+            row_builder(
+                self.tr("Target Language:"), self.target_language, "target_language"
+            )
         )
 
         self.font_file = QComboBox()
         for font_name in scan_font_files(project_root):
             self.font_file.addItem(font_name, font_name)
-        self.add_row(row_builder(self.tr("字体文件:"), self.font_file, "font_file"))
+        self.add_row(row_builder(self.tr("Font File:"), self.font_file, "font_file"))
 
-        self.generate_transcript = QCheckBox(self.tr("全流程时生成转录"))
+        self.generate_transcript = QCheckBox(
+            self.tr("Generate transcript for workflows")
+        )
         self.add_row(row_builder("", self.generate_transcript, "generate_transcript"))
 
 
 class CookieSettingsWidget(SettingsSection):
     def __init__(self, parent: QWidget | None = None) -> None:
-        super().__init__("Cookie", parent)
+        super().__init__(self.tr("Cookie"), parent)
         self.cookie_status = QLabel()
         self.section_layout.addWidget(self.cookie_status)
 
@@ -80,9 +84,9 @@ class CookieSettingsWidget(SettingsSection):
             filter=self.tr("Text Files (*.txt)"),
         )
         button_row.addWidget(self.cookie_import_picker, stretch=1)
-        self.cookie_import_btn = QPushButton(self.tr("导入"))
+        self.cookie_import_btn = QPushButton(self.tr("Import"))
         button_row.addWidget(self.cookie_import_btn)
-        self.cookie_validate_btn = QPushButton(self.tr("验证"))
+        self.cookie_validate_btn = QPushButton(self.tr("Validate"))
         button_row.addWidget(self.cookie_validate_btn)
         self.section_layout.addLayout(button_row)
 
@@ -92,11 +96,15 @@ class OutputSettingsWidget(SettingsSection):
         super().__init__(self.tr("Output Paths"), parent)
         self.project_dir = FilePicker(mode="directory")
         self.add_row(
-            row_builder(self.tr("项目工作目录:"), self.project_dir, "project_dir")
+            row_builder(
+                self.tr("Project Workspace Directory:"), self.project_dir, "project_dir"
+            )
         )
         self.output_dir = FilePicker(mode="directory")
         self.add_row(
-            row_builder(self.tr("最终输出目录:"), self.output_dir, "output_dir")
+            row_builder(
+                self.tr("Final Output Directory:"), self.output_dir, "output_dir"
+            )
         )
 
 
@@ -105,17 +113,17 @@ class ProxySettingsWidget(SettingsSection):
         super().__init__(self.tr("Proxy"), parent)
         self.proxy = QLineEdit()
         self.proxy.setPlaceholderText("http://127.0.0.1:7890")
-        self.add_row(row_builder(self.tr("代理地址:"), self.proxy, "proxy"))
+        self.add_row(row_builder(self.tr("Proxy URL:"), self.proxy, "proxy"))
 
 
 class MaintenanceSettingsWidget(SettingsSection):
     def __init__(self, row_builder: RowBuilder, parent: QWidget | None = None) -> None:
         super().__init__(self.tr("Maintenance"), parent)
-        self.debug_mode = QCheckBox(self.tr("启用调试模式（显示详细日志）"))
+        self.debug_mode = QCheckBox(self.tr("Enable debug mode (show verbose logs)"))
         self.add_row(row_builder("", self.debug_mode, "debug_mode"))
 
         button_row = QHBoxLayout()
-        self.reset_all_btn = QPushButton(self.tr("重置所有设置"))
+        self.reset_all_btn = QPushButton(self.tr("Reset All Settings"))
         button_row.addWidget(self.reset_all_btn)
         button_row.addStretch(1)
         self.section_layout.addLayout(button_row)

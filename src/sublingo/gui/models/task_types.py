@@ -1,6 +1,26 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from enum import Enum
+
+from PySide6.QtCore import QCoreApplication
+
+
+def _register_i18n_keys() -> None:
+    QCoreApplication.translate("TaskType", "Full Workflow")
+    QCoreApplication.translate("TaskType", "Download")
+    QCoreApplication.translate("TaskType", "Translate")
+    QCoreApplication.translate("TaskType", "Softsub")
+    QCoreApplication.translate("TaskType", "Hardsub")
+    QCoreApplication.translate("TaskType", "Transcript")
+    QCoreApplication.translate("TaskType", "Font Subset")
+    QCoreApplication.translate("TaskType", "Workflow")
+    QCoreApplication.translate("TaskType", "Module")
+    QCoreApplication.translate("TaskType", "Single")
+    QCoreApplication.translate("TaskType", "Batch")
+    QCoreApplication.translate("TaskType", "{scope}: {name}")
+    QCoreApplication.translate("TasksPage", "Batch: {completed}/{total} completed")
+
 
 STAGE_PENDING: str = "pending"
 STAGE_ACTIVE: str = "active"
@@ -27,13 +47,20 @@ class TaskStatus(Enum):
 
 TASK_TYPE_DISPLAY: dict[TaskType, str] = {
     TaskType.WORKFLOW: "Full Workflow",
-    TaskType.DOWNLOAD: "Download Only",
-    TaskType.TRANSLATE: "Translate Only",
-    TaskType.SOFTSUB: "Softsub Only",
-    TaskType.HARDSUB: "Hardsub Only",
-    TaskType.TRANSCRIPT: "Transcript Only",
-    TaskType.FONT_SUBSET: "Font Subset Only",
+    TaskType.DOWNLOAD: "Download",
+    TaskType.TRANSLATE: "Translate",
+    TaskType.SOFTSUB: "Softsub",
+    TaskType.HARDSUB: "Hardsub",
+    TaskType.TRANSCRIPT: "Transcript",
+    TaskType.FONT_SUBSET: "Font Subset",
 }
+
+TASK_SCOPE_WORKFLOW: str = "Workflow"
+TASK_SCOPE_MODULE: str = "Module"
+TASK_LABEL_TEMPLATE: str = "{scope}: {name}"
+TASK_WORKFLOW_SINGLE_LABEL: str = "Single"
+TASK_WORKFLOW_BATCH_LABEL: str = "Batch"
+TASK_BATCH_SUMMARY_TEMPLATE: str = "Batch: {completed}/{total} completed"
 
 TASK_STAGES: dict[TaskType, list[str]] = {
     TaskType.WORKFLOW: [
@@ -78,3 +105,35 @@ BACKEND_STAGE_TO_DISPLAY: dict[str, str] = {
     "transcript": "Transcript",
     "complete": "Complete",
 }
+
+
+def is_workflow_task(task_type: TaskType) -> bool:
+    return task_type == TaskType.WORKFLOW
+
+
+def format_task_type_label(
+    task_type: TaskType,
+    translator: Callable[[str], str],
+    *,
+    is_batch: bool = False,
+) -> str:
+    if is_workflow_task(task_type):
+        scope = translator(TASK_SCOPE_WORKFLOW)
+        name = translator(
+            TASK_WORKFLOW_BATCH_LABEL if is_batch else TASK_WORKFLOW_SINGLE_LABEL
+        )
+    else:
+        scope = translator(TASK_SCOPE_MODULE)
+        name = translator(TASK_TYPE_DISPLAY.get(task_type, "Task"))
+    return translator(TASK_LABEL_TEMPLATE).format(scope=scope, name=name)
+
+
+def format_batch_summary(
+    completed: int,
+    total: int,
+    translator: Callable[[str], str],
+) -> str:
+    return translator(TASK_BATCH_SUMMARY_TEMPLATE).format(
+        completed=completed,
+        total=total,
+    )

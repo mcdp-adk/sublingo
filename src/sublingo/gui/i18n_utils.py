@@ -12,6 +12,7 @@ LANGUAGE_FILE_MAP: dict[str, str] = {
     SIMPLIFIED_CHINESE: "sublingo_zh_Hans.qm",
 }
 I18N_DIR = Path(__file__).resolve().parent.parent / "i18n"
+_ACTIVE_TRANSLATOR: QTranslator | None = None
 
 
 def load_translator(
@@ -31,11 +32,17 @@ def load_translator(
     if not qm_path.exists():
         return None
 
+    global _ACTIVE_TRANSLATOR
+    if _ACTIVE_TRANSLATOR is not None:
+        app.removeTranslator(_ACTIVE_TRANSLATOR)
+        _ACTIVE_TRANSLATOR = None
+
     translator = QTranslator()
     if not translator.load(str(qm_path)):
         return None
 
     app.installTranslator(translator)
+    _ACTIVE_TRANSLATOR = translator
     return translator
 
 

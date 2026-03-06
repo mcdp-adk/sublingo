@@ -17,17 +17,26 @@ class Stepper(QWidget):
         self._stages: list[str] = []
         self._statuses: dict[str, str] = {}
         self._labels: dict[str, QLabel] = {}
+        self._display_labels: dict[str, str] = {}
 
-    def set_stages(self, stages: list[str]) -> None:
+    def set_stages(
+        self,
+        stages: list[str],
+        display_labels: dict[str, str] | None = None,
+    ) -> None:
         """Initialize stage list."""
         self._stages = list(stages)
         self._statuses = {s: "pending" for s in stages}
+        self._display_labels = {
+            stage: (display_labels or {}).get(stage, stage) for stage in self._stages
+        }
 
         # Clear layout
         while self._layout.count():
             item = self._layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
+            widget = item.widget() if item is not None else None
+            if widget is not None:
+                widget.deleteLater()
         self._labels.clear()
 
         for i, stage in enumerate(self._stages):
@@ -70,5 +79,6 @@ class Stepper(QWidget):
                 symbol = "○"
                 color = "#5C6370"
 
-            lbl.setText(f"{symbol} {stage}")
+            display_stage = self._display_labels.get(stage, stage)
+            lbl.setText(f"{symbol} {display_stage}")
             lbl.setStyleSheet(f"color: {color}; font-weight: bold;")

@@ -4,6 +4,7 @@ from typing import Any
 
 from PySide6.QtCore import QCoreApplication
 
+from sublingo.gui import i18n_utils
 from sublingo.gui.i18n_utils import detect_system_language
 from sublingo.gui.i18n_utils import load_translator
 
@@ -68,3 +69,12 @@ def test_load_translator_returns_none_for_unsupported_language() -> None:
     app = _get_app()
 
     assert load_translator(app, "ja") is None
+
+
+def test_load_translator_keeps_active_reference() -> None:
+    app = _get_app()
+
+    translator = load_translator(app, "zh_CN")
+
+    assert translator is not None
+    assert i18n_utils._ACTIVE_TRANSLATOR is translator

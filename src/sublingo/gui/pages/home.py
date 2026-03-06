@@ -20,7 +20,9 @@ from PySide6.QtWidgets import (
 from sublingo.core.config import ConfigManager
 from sublingo.core.cookie import validate_cookie_file
 from sublingo.gui.models.task import TaskManager
-from sublingo.gui.models.task_types import TASK_TYPE_DISPLAY
+from sublingo.gui.models.task_info import format_status_summary
+from sublingo.gui.models.task_info import format_task_title
+from sublingo.gui.models.task_types import format_task_type_label
 from sublingo.gui.models.task_types import TaskType
 from sublingo.gui.widgets.batch_preview_dialog import PreviewDialog
 from sublingo.gui.widgets.batch_preview_dialog import PreviewFetchWorker
@@ -66,7 +68,10 @@ class HomePage(QWidget):
         selector_row.addWidget(QLabel(self.tr("Type:")))
         self._task_type = QComboBox()
         for task_type in TaskType:
-            label = QCoreApplication.translate("TaskType", TASK_TYPE_DISPLAY[task_type])
+            label = format_task_type_label(
+                task_type,
+                lambda text: QCoreApplication.translate("TaskType", text),
+            )
             self._task_type.addItem(label, task_type.value)
         self._task_type.currentIndexChanged.connect(self._on_type_changed)
         selector_row.addWidget(self._task_type, stretch=1)
@@ -252,9 +257,12 @@ class HomePage(QWidget):
     def _create_tasks_for_urls(self, task_type: TaskType, urls: list[str]) -> None:
         if self._task_mgr is None:
             return
-        for url in urls:
+        batch_total = len(urls)
+        for index, url in enumerate(urls, start=1):
             params = self._forms.collect_params(task_type, url)
             if params is not None:
+                params["batch_index"] = index
+                params["batch_total"] = batch_total
                 self._task_mgr.create_task(task_type, params)
 
     def _on_task_double_clicked(self, _item: QListWidgetItem) -> None:
@@ -271,8 +279,14 @@ class HomePage(QWidget):
             task = self._task_mgr.get_task(task_id)
             if task is None:
                 continue
-            title = getattr(task, "display_name", task_id)
-            status = getattr(task, "status_summary", "")
+            title = format_task_title(
+                task,
+                lambda text: QCoreApplication.translate("TaskType", text),
+            )
+            status = format_status_summary(
+                task,
+                lambda text: QCoreApplication.translate("TaskStatus", text),
+            )
             item = QListWidgetItem(f"{title}   {status}")
             item.setData(Qt.ItemDataRole.UserRole, task_id)
             self._task_list.addItem(item)

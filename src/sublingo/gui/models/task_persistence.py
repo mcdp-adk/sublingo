@@ -16,7 +16,7 @@ from sublingo.gui.models.task_types import TaskStatus
 from sublingo.gui.models.task_types import TaskType
 
 TASKS_PAYLOAD_KEY: str = "tasks"
-INTERRUPTED_TASK_ERROR: str = "应用关闭时任务仍在运行"
+INTERRUPTED_TASK_ERROR: str = "Task was still running when app closed"
 
 
 def save_tasks(tasks: dict[str, TaskInfo], path: Path) -> None:

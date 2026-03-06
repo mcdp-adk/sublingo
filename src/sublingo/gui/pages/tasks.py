@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -18,7 +18,13 @@ from PySide6.QtWidgets import (
 )
 
 from sublingo.gui.models.task import TaskManager
+from sublingo.gui.models.task_info import format_status_summary
+from sublingo.gui.models.task_info import format_task_title
+from sublingo.gui.models.task_info import is_batch_task
 from sublingo.gui.models.task_types import TaskStatus
+from sublingo.gui.models.task_types import TaskType
+from sublingo.gui.models.task_types import format_batch_summary
+from sublingo.gui.models.task_types import format_task_type_label
 from sublingo.gui.widgets.log_viewer import LogViewer
 from sublingo.gui.widgets.stepper import Stepper
 
@@ -32,15 +38,28 @@ class TaskItemWidget(QWidget):
         layout.setContentsMargins(5, 5, 5, 5)
 
         title = getattr(task, "video_title", "") or getattr(
-            task, "display_name", "Unknown Task"
+            task,
+            "display_name",
+            self.tr("Unknown Task"),
         )
         self.title_label = QLabel(title)
         self.title_label.setStyleSheet("font-weight: bold;")
         layout.addWidget(self.title_label)
 
         status_layout = QHBoxLayout()
-        self.type_label = QLabel(str(getattr(task, "task_type", "")))
-        self.status_label = QLabel(getattr(task, "status_summary", ""))
+        self.type_label = QLabel(
+            format_task_type_label(
+                _coerce_task_type(task),
+                lambda text: QCoreApplication.translate("TaskType", text),
+                is_batch=is_batch_task(task),
+            )
+        )
+        self.status_label = QLabel(
+            format_status_summary(
+                task,
+                lambda text: QCoreApplication.translate("TaskStatus", text),
+            )
+        )
         status_layout.addWidget(self.type_label)
         status_layout.addWidget(self.status_label)
         status_layout.addStretch()
@@ -52,11 +71,24 @@ class TaskItemWidget(QWidget):
 
     def update_task(self, task: Any) -> None:
         title = getattr(task, "video_title", "") or getattr(
-            task, "display_name", "Unknown Task"
+            task,
+            "display_name",
+            self.tr("Unknown Task"),
         )
         self.title_label.setText(title)
-        self.type_label.setText(str(getattr(task, "task_type", "")))
-        self.status_label.setText(getattr(task, "status_summary", ""))
+        self.type_label.setText(
+            format_task_type_label(
+                _coerce_task_type(task),
+                lambda text: QCoreApplication.translate("TaskType", text),
+                is_batch=is_batch_task(task),
+            )
+        )
+        self.status_label.setText(
+            format_status_summary(
+                task,
+                lambda text: QCoreApplication.translate("TaskStatus", text),
+            )
+        )
         self.progress_bar.setValue(getattr(task, "progress_percent", 0))
 
 
@@ -99,7 +131,9 @@ class TaskDetailWidget(QWidget):
 
         # Update info card
         title = getattr(task, "video_title", "") or getattr(
-            task, "display_name", "Unknown Task"
+            task,
+            "display_name",
+            self.tr("Unknown Task"),
         )
         channel = getattr(task, "channel", "")
         duration = getattr(task, "duration", "")
@@ -108,18 +142,21 @@ class TaskDetailWidget(QWidget):
 
         info_text = f"<b>{title}</b><br>"
         if channel:
-            info_text += f"Channel: {channel} | "
+            info_text += f"{self.tr('Channel')}: {channel} | "
         if duration:
-            info_text += f"Duration: {duration} | "
+            info_text += f"{self.tr('Duration')}: {duration} | "
         if upload_date:
-            info_text += f"Date: {upload_date} | "
+            info_text += f"{self.tr('Date')}: {upload_date} | "
         if video_id:
-            info_text += f"ID: {video_id}"
+            info_text += f"{self.tr('ID')}: {video_id}"
         self.info_label.setText(info_text)
 
         # Update stepper
         stages = getattr(task, "stages", [])
-        self.stepper.set_stages(stages)
+        stage_labels = {
+            stage: QCoreApplication.translate("TaskStatus", stage) for stage in stages
+        }
+        self.stepper.set_stages(stages, stage_labels)
         stage_statuses = getattr(task, "stage_statuses", {})
         for stage in stages:
             status = stage_statuses.get(stage, "pending")
@@ -248,7 +285,9 @@ class TasksPage(QWidget):
             if task is not None and task.status == TaskStatus.COMPLETED:
                 completed += 1
 
-        self.batch_summary_label.setText(f"Batch: {completed}/{total} completed")
+        self.batch_summary_label.setText(
+            format_batch_summary(completed, total, self.tr)
+        )
         self.batch_summary_label.show()
 
     def _on_selection_changed(self) -> None:
@@ -286,3 +325,13 @@ class TasksPage(QWidget):
         resume_workflow = getattr(self._task_mgr, "resume_workflow", None)
         if callable(resume_workflow):
             resume_workflow(self.detail_widget._current_task_id)
+
+
+def _coerce_task_type(task: Any) -> TaskType:
+    raw = getattr(task, "task_type", TaskType.WORKFLOW)
+    if isinstance(raw, TaskType):
+        return raw
+    try:
+        return TaskType(str(raw))
+    except ValueError:
+        return TaskType.WORKFLOW
