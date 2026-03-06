@@ -1,0 +1,2 @@
+Wizard tested successfully.
+Pages: Language, AI Configuration, Other Settings.

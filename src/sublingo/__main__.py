@@ -37,8 +37,11 @@ def main() -> int:
         app.setFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.GeneralFont))
 
     if config_mgr.is_first_run:
-        # TODO: Show Setup Wizard
-        pass
+        from sublingo.gui.setup_wizard import SetupWizard
+
+        wizard = SetupWizard(config_mgr)
+        if wizard.exec() != wizard.DialogCode.Accepted:
+            return 0
 
     window = MainWindow(config_mgr)
     window.show()

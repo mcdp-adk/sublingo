@@ -1,0 +1,18 @@
+{
+  "project_dir": "./output",
+  "output_dir": "./output",
+  "target_language": "zh-Hans",
+  "generate_transcript": false,
+  "font_file": "LXGWWenKai-Medium.ttf",
+  "ai_provider": "gemini",
+  "ai_base_url": "https://generativelanguage.googleapis.com/v1beta",
+  "ai_model": "gemini-2.5-flash-preview",
+  "ai_api_key": "",
+  "ai_translate_batch_size": 20,
+  "ai_proofread_batch_size": 45,
+  "ai_segment_batch_size": 45,
+  "ai_max_retries": 3,
+  "proxy": "",
+  "language": "auto",
+  "debug_mode": false
+}
