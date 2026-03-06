@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sublingo import __version__
 from sublingo.core.config import ConfigManager
 from sublingo.gui.models.task import TaskManager
 from sublingo.gui.pages.home import HomePage
@@ -30,7 +31,7 @@ class MainWindow(QMainWindow):
         self._config_mgr = config_mgr
         self._task_mgr = TaskManager(config_mgr, self)
 
-        self.setWindowTitle(self.tr("sublingo"))
+        self.setWindowTitle(f"Sublingo v{__version__}")
         self.setMinimumSize(900, 600)
 
         # -- Central widget & layout -----------------------------------------

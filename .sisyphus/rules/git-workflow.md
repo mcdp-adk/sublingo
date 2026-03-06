@@ -12,6 +12,14 @@ description: "Git workflow policy: safe commit practices and branch protections"
 - 提交前必须确认测试通过：`uv run pytest`。
 - 禁止将敏感信息（如密钥、凭据、`.env` 等）纳入提交。
 
+## Pre-Commit Checklist
+
+执行 `git commit` 前必须：
+
+1. 执行 `git status` 查看所有变更文件
+2. 确认所有相关文件已 `git add` 到 staging area
+3. 执行 `git diff --staged` 审查变更内容
+
 ## Branch & Push Policy
 
 - 禁止对 `main` / `master` 执行 `--force` 推送。

@@ -41,6 +41,7 @@
 
 - 未经明确请求，禁止执行 `git commit`、`git push`、`git rebase`。
 - 提交前必须完成并通过 `uv run pytest`。
+- 提交前必须执行 `git status` 确认所有变更文件已 staged，禁止遗漏任何变更。
 - 禁止提交敏感信息（如密钥、凭据、`.env`）。
 - 禁止对 `main` / `master` 执行 `--force` 推送。
 - 禁止在无明确要求时使用破坏性命令（如 `reset --hard`）。

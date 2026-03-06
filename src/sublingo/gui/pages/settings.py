@@ -3,10 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QLabel,
     QLineEdit,
     QMessageBox,
     QPushButton,
@@ -16,6 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sublingo import __version__
 from sublingo.core.config import ConfigManager
 from sublingo.core.cookie import import_cookie_file, validate_cookie_file
 from sublingo.gui.config_options import AI_PROVIDER_PRESETS
@@ -94,6 +96,12 @@ class SettingsPage(QWidget):
             self._maintenance_section,
         ):
             self._layout.addWidget(section)
+
+        # Version label at bottom
+        version_label = QLabel(f"Sublingo v{__version__}")
+        version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        version_label.setStyleSheet("color: palette(mid); font-size: 11px;")
+        self._layout.addWidget(version_label)
 
         self._update_cookie_status()
 
