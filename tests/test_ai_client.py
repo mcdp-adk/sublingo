@@ -66,6 +66,22 @@ async def test_init_sets_trust_env_and_proxy():
 
 
 @pytest.mark.asyncio
+async def test_init_supports_disabled_system_proxy_lookup():
+    client = AiClient(
+        base_url="https://api.example.com/v1",
+        api_key="key",
+        model="gpt-test",
+        proxy=None,
+        trust_env=False,
+    )
+
+    assert FakeAsyncClient.init_kwargs["trust_env"] is False
+    assert FakeAsyncClient.init_kwargs["proxy"] is None
+
+    await client.close()
+
+
+@pytest.mark.asyncio
 async def test_translate_batch_returns_string_array():
     FakeAsyncClient.queue = [
         FakeResponse(

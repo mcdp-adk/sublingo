@@ -3,60 +3,72 @@
     <context>
         <name>AIConfigPage</name>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="34" />
-            <location filename="../gui/wizards/ai_config_page.py" line="84" />
+            <location filename="../gui/wizards/ai_config_page.py" line="44" />
+            <location filename="../gui/wizards/ai_config_page.py" line="113" />
             <source>AI Configuration</source>
             <translation>AI Configuration</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="35" />
-            <location filename="../gui/wizards/ai_config_page.py" line="85" />
+            <location filename="../gui/wizards/ai_config_page.py" line="45" />
+            <location filename="../gui/wizards/ai_config_page.py" line="114" />
             <source>Configure AI provider and API key.</source>
             <translation>Configure AI provider and API key.</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="38" />
-            <location filename="../gui/wizards/ai_config_page.py" line="86" />
+            <location filename="../gui/wizards/ai_config_page.py" line="48" />
+            <location filename="../gui/wizards/ai_config_page.py" line="115" />
             <source>Provider:</source>
             <translation>Provider:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="47" />
-            <location filename="../gui/wizards/ai_config_page.py" line="87" />
+            <location filename="../gui/wizards/ai_config_page.py" line="57" />
+            <location filename="../gui/wizards/ai_config_page.py" line="116" />
             <source>Base URL:</source>
             <translation>Base URL:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="52" />
-            <location filename="../gui/wizards/ai_config_page.py" line="88" />
+            <location filename="../gui/wizards/ai_config_page.py" line="62" />
+            <location filename="../gui/wizards/ai_config_page.py" line="117" />
             <source>Model:</source>
             <translation>Model:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="57" />
-            <location filename="../gui/wizards/ai_config_page.py" line="89" />
+            <location filename="../gui/wizards/ai_config_page.py" line="67" />
+            <location filename="../gui/wizards/ai_config_page.py" line="118" />
             <source>API Key:</source>
             <translation>API Key:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="63" />
-            <location filename="../gui/wizards/ai_config_page.py" line="90" />
-            <location filename="../gui/wizards/ai_config_page.py" line="115" />
+            <location filename="../gui/wizards/ai_config_page.py" line="73" />
+            <location filename="../gui/wizards/ai_config_page.py" line="119" />
+            <source>Proxy Mode:</source>
+            <translation>Proxy Mode:</translation>
+        </message>
+        <message>
+            <location filename="../gui/wizards/ai_config_page.py" line="81" />
+            <location filename="../gui/wizards/ai_config_page.py" line="120" />
+            <source>Proxy URL:</source>
+            <translation>Proxy URL:</translation>
+        </message>
+        <message>
+            <location filename="../gui/wizards/ai_config_page.py" line="87" />
+            <location filename="../gui/wizards/ai_config_page.py" line="124" />
+            <location filename="../gui/wizards/ai_config_page.py" line="159" />
             <source>Test Connection</source>
             <translation>Test Connection</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="102" />
+            <location filename="../gui/wizards/ai_config_page.py" line="139" />
             <source>Testing...</source>
             <translation>Testing...</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="117" />
+            <location filename="../gui/wizards/ai_config_page.py" line="161" />
             <source>Connection Successful</source>
             <translation>Connection Successful</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="119" />
+            <location filename="../gui/wizards/ai_config_page.py" line="163" />
             <source>Connection Failed</source>
             <translation>Connection Failed</translation>
         </message>
@@ -64,52 +76,52 @@
     <context>
         <name>AISettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="59" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="69" />
             <source>AI</source>
             <translation>AI</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="63" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="73" />
             <source>Provider:</source>
             <translation>Provider:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="66" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="76" />
             <source>Base URL:</source>
             <translation>Base URL:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="69" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="79" />
             <source>Model:</source>
             <translation>Model:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="73" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="83" />
             <source>API Key:</source>
             <translation>API Key:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="79" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="89" />
             <source>Segmentation Batch Size:</source>
             <translation>Segmentation Batch Size:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="89" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="99" />
             <source>Translation Batch Size:</source>
             <translation>Translation Batch Size:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="99" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="109" />
             <source>Proofreading Batch Size:</source>
             <translation>Proofreading Batch Size:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="109" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="119" />
             <source>Max Retries:</source>
             <translation>Max Retries:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="116" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="126" />
             <source>Test Connection</source>
             <translation>Test Connection</translation>
         </message>
@@ -160,22 +172,22 @@
     <context>
         <name>CookieSettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="77" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="81" />
             <source>Cookie</source>
             <translation>Cookie</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="84" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="88" />
             <source>Text Files (*.txt)</source>
             <translation>Text Files (*.txt)</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="87" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="91" />
             <source>Import</source>
             <translation>Import</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="89" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="93" />
             <source>Validate</source>
             <translation>Validate</translation>
         </message>
@@ -215,12 +227,12 @@
             <translation>System Language</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="34" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="38" />
             <source>GUI</source>
             <translation>GUI</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="40" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="44" />
             <source>Interface Language:</source>
             <translation>Interface Language:</translation>
         </message>
@@ -228,86 +240,86 @@
     <context>
         <name>HomePage</name>
         <message>
-            <location filename="../gui/pages/home.py" line="64" />
+            <location filename="../gui/pages/home.py" line="65" />
             <source>New Task</source>
             <translation>New Task</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="68" />
+            <location filename="../gui/pages/home.py" line="69" />
             <source>Type:</source>
             <translation>Type:</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="89" />
+            <location filename="../gui/pages/home.py" line="90" />
             <source>Preview</source>
             <translation>Preview</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="94" />
+            <location filename="../gui/pages/home.py" line="95" />
             <source>Create Task</source>
             <translation>Create Task</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="102" />
+            <location filename="../gui/pages/home.py" line="103" />
             <source>Active Tasks</source>
             <translation>Active Tasks</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="138" />
-            <location filename="../gui/pages/home.py" line="148" />
-            <location filename="../gui/pages/home.py" line="200" />
-            <location filename="../gui/pages/home.py" line="208" />
-            <location filename="../gui/pages/home.py" line="217" />
-            <location filename="../gui/pages/home.py" line="241" />
-            <location filename="../gui/pages/home.py" line="250" />
+            <location filename="../gui/pages/home.py" line="139" />
+            <location filename="../gui/pages/home.py" line="149" />
+            <location filename="../gui/pages/home.py" line="201" />
+            <location filename="../gui/pages/home.py" line="209" />
+            <location filename="../gui/pages/home.py" line="218" />
+            <location filename="../gui/pages/home.py" line="242" />
+            <location filename="../gui/pages/home.py" line="251" />
             <source>Error</source>
             <translation>Error</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="138" />
+            <location filename="../gui/pages/home.py" line="139" />
             <source>Cookie file is invalid</source>
             <translation>Cookie file is invalid</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="148" />
-            <location filename="../gui/pages/home.py" line="241" />
+            <location filename="../gui/pages/home.py" line="149" />
+            <location filename="../gui/pages/home.py" line="242" />
             <source>Please enter at least one URL</source>
             <translation>Please enter at least one URL</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="158" />
+            <location filename="../gui/pages/home.py" line="159" />
             <source>Fetching video info...</source>
             <translation>Fetching video info...</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="159" />
+            <location filename="../gui/pages/home.py" line="160" />
             <source>Cancel</source>
             <translation>Cancel</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="191" />
+            <location filename="../gui/pages/home.py" line="192" />
             <source>Parsing URL ({current}/{total}):
 {url}</source>
             <translation>Parsing URL ({current}/{total}):
 {url}</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="200" />
+            <location filename="../gui/pages/home.py" line="201" />
             <source>No videos found</source>
             <translation>No videos found</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="208" />
+            <location filename="../gui/pages/home.py" line="209" />
             <source>Please select at least one video</source>
             <translation>Please select at least one video</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="218" />
+            <location filename="../gui/pages/home.py" line="219" />
             <source>Failed to fetch video info: {error}</source>
             <translation>Failed to fetch video info: {error}</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="251" />
+            <location filename="../gui/pages/home.py" line="252" />
             <source>Please fill in all required fields</source>
             <translation>Please fill in all required fields</translation>
         </message>
@@ -443,17 +455,17 @@
     <context>
         <name>MaintenanceSettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="121" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="136" />
             <source>Maintenance</source>
             <translation>Maintenance</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="122" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="137" />
             <source>Enable debug mode (show verbose logs)</source>
             <translation>Enable debug mode (show verbose logs)</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="126" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="141" />
             <source>Reset All Settings</source>
             <translation>Reset All Settings</translation>
         </message>
@@ -461,84 +473,86 @@
     <context>
         <name>OtherSettingsPage</name>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="27" />
-            <location filename="../gui/wizards/other_settings_page.py" line="66" />
+            <location filename="../gui/wizards/other_settings_page.py" line="26" />
+            <location filename="../gui/wizards/other_settings_page.py" line="60" />
             <source>Other Settings</source>
             <translation>Other Settings</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="28" />
-            <location filename="../gui/wizards/other_settings_page.py" line="67" />
             <source>Configure cookies, output directory, and proxy.</source>
             <translation>Configure cookies, output directory, and proxy.</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="31" />
-            <location filename="../gui/wizards/other_settings_page.py" line="68" />
+            <location filename="../gui/wizards/other_settings_page.py" line="30" />
+            <location filename="../gui/wizards/other_settings_page.py" line="62" />
             <source>Cookie File:</source>
             <translation>Cookie File:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="36" />
+            <location filename="../gui/wizards/other_settings_page.py" line="35" />
             <source>Text Files (*.txt)</source>
             <translation>Text Files (*.txt)</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="39" />
-            <location filename="../gui/wizards/other_settings_page.py" line="69" />
+            <location filename="../gui/wizards/other_settings_page.py" line="38" />
+            <location filename="../gui/wizards/other_settings_page.py" line="63" />
             <source>Import</source>
             <translation>Import</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="42" />
-            <location filename="../gui/wizards/other_settings_page.py" line="70" />
+            <location filename="../gui/wizards/other_settings_page.py" line="41" />
+            <location filename="../gui/wizards/other_settings_page.py" line="64" />
             <source>Validate</source>
             <translation>Validate</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="51" />
-            <location filename="../gui/wizards/other_settings_page.py" line="71" />
+            <location filename="../gui/wizards/other_settings_page.py" line="50" />
+            <location filename="../gui/wizards/other_settings_page.py" line="65" />
             <source>Output Directory:</source>
             <translation>Output Directory:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="58" />
-            <location filename="../gui/wizards/other_settings_page.py" line="72" />
             <source>Proxy:</source>
             <translation>Proxy:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="85" />
+            <location filename="../gui/wizards/other_settings_page.py" line="27" />
+            <location filename="../gui/wizards/other_settings_page.py" line="61" />
+            <source>Configure cookies and output directory.</source>
+            <translation>Configure cookies and output directory.</translation>
+        </message>
+        <message>
+            <location filename="../gui/wizards/other_settings_page.py" line="78" />
             <source>Import Successful</source>
             <translation>Import Successful</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="85" />
+            <location filename="../gui/wizards/other_settings_page.py" line="78" />
             <source>Cookie file imported.</source>
             <translation>Cookie file imported.</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="91" />
+            <location filename="../gui/wizards/other_settings_page.py" line="84" />
             <source>Validation Passed</source>
             <translation>Validation Passed</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="93" />
+            <location filename="../gui/wizards/other_settings_page.py" line="86" />
             <source>Validation Failed</source>
             <translation>Validation Failed</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="99" />
+            <location filename="../gui/wizards/other_settings_page.py" line="92" />
             <source>Status: Not imported</source>
             <translation>Status: Not imported</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="105" />
+            <location filename="../gui/wizards/other_settings_page.py" line="98" />
             <source>Status: {} ({} bytes)</source>
             <translation>Status: {} ({} bytes)</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="109" />
+            <location filename="../gui/wizards/other_settings_page.py" line="102" />
             <source>Status: {}</source>
             <translation>Status: {}</translation>
         </message>
@@ -546,17 +560,17 @@
     <context>
         <name>OutputSettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="96" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="100" />
             <source>Output Paths</source>
             <translation>Output Paths</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="100" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="104" />
             <source>Project Workspace Directory:</source>
             <translation>Project Workspace Directory:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="106" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="110" />
             <source>Final Output Directory:</source>
             <translation>Final Output Directory:</translation>
         </message>
@@ -605,14 +619,37 @@
         </message>
     </context>
     <context>
+        <name>ProxyMode</name>
+        <message>
+            <location filename="../gui/config_options.py" line="64" />
+            <source>Use System Proxy</source>
+            <translation>Use System Proxy</translation>
+        </message>
+        <message>
+            <location filename="../gui/config_options.py" line="65" />
+            <source>Use Custom Proxy</source>
+            <translation>Use Custom Proxy</translation>
+        </message>
+        <message>
+            <location filename="../gui/config_options.py" line="66" />
+            <source>No Proxy</source>
+            <translation>No Proxy</translation>
+        </message>
+    </context>
+    <context>
         <name>ProxySettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="113" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="117" />
             <source>Proxy</source>
             <translation>Proxy</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="116" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="121" />
+            <source>Proxy Mode:</source>
+            <translation>Proxy Mode:</translation>
+        </message>
+        <message>
+            <location filename="../gui/widgets/settings_group_widgets.py" line="125" />
             <source>Proxy URL:</source>
             <translation>Proxy URL:</translation>
         </message>
@@ -620,92 +657,92 @@
     <context>
         <name>SettingsPage</name>
         <message>
-            <location filename="../gui/pages/settings.py" line="112" />
+            <location filename="../gui/pages/settings.py" line="113" />
             <source>Reset to default</source>
             <translation>Reset to default</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="278" />
+            <location filename="../gui/pages/settings.py" line="281" />
             <source>Info</source>
             <translation>Info</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="279" />
+            <location filename="../gui/pages/settings.py" line="282" />
             <source>Interface language saved. Restart the app to apply changes.</source>
             <translation>Interface language saved. Restart the app to apply changes.</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="313" />
+            <location filename="../gui/pages/settings.py" line="316" />
             <source>Testing...</source>
             <translation>Testing...</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="326" />
+            <location filename="../gui/pages/settings.py" line="335" />
             <source>Test Connection</source>
             <translation>Test Connection</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="328" />
+            <location filename="../gui/pages/settings.py" line="337" />
             <source>Connection Successful</source>
             <translation>Connection Successful</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="330" />
+            <location filename="../gui/pages/settings.py" line="339" />
             <source>Connection Failed</source>
             <translation>Connection Failed</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="340" />
+            <location filename="../gui/pages/settings.py" line="349" />
             <source>Import Successful</source>
             <translation>Import Successful</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="341" />
+            <location filename="../gui/pages/settings.py" line="350" />
             <source>Cookie file updated</source>
             <translation>Cookie file updated</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="347" />
+            <location filename="../gui/pages/settings.py" line="356" />
             <source>Validation Passed</source>
             <translation>Validation Passed</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="349" />
+            <location filename="../gui/pages/settings.py" line="358" />
             <source>Validation Failed</source>
             <translation>Validation Failed</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="356" />
+            <location filename="../gui/pages/settings.py" line="365" />
             <source>Cookie status: not imported</source>
             <translation>Cookie status: not imported</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="363" />
+            <location filename="../gui/pages/settings.py" line="372" />
             <source>Cookie status: {} ({} bytes)</source>
             <translation>Cookie status: {} ({} bytes)</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="370" />
+            <location filename="../gui/pages/settings.py" line="379" />
             <source>Cookie status: {}</source>
             <translation>Cookie status: {}</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="377" />
+            <location filename="../gui/pages/settings.py" line="386" />
             <source>Confirm Reset</source>
             <translation>Confirm Reset</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="379" />
+            <location filename="../gui/pages/settings.py" line="388" />
             <source>Reset all settings? This will delete config.json and requires restarting the app.</source>
             <translation>Reset all settings? This will delete config.json and requires restarting the app.</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="388" />
+            <location filename="../gui/pages/settings.py" line="397" />
             <source>Reset Complete</source>
             <translation>Reset Complete</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="390" />
+            <location filename="../gui/pages/settings.py" line="399" />
             <source>Settings reset complete. Please restart the app to apply changes.</source>
             <translation>Settings reset complete. Please restart the app to apply changes.</translation>
         </message>
@@ -714,27 +751,27 @@
         <name>SetupWizard</name>
         <message>
             <location filename="../gui/setup_wizard.py" line="21" />
-            <location filename="../gui/setup_wizard.py" line="54" />
+            <location filename="../gui/setup_wizard.py" line="56" />
             <source>Sublingo Setup Wizard</source>
             <translation>Sublingo Setup Wizard</translation>
         </message>
         <message>
-            <location filename="../gui/setup_wizard.py" line="58" />
+            <location filename="../gui/setup_wizard.py" line="60" />
             <source>&lt; Back</source>
             <translation>&lt; Back</translation>
         </message>
         <message>
-            <location filename="../gui/setup_wizard.py" line="59" />
+            <location filename="../gui/setup_wizard.py" line="61" />
             <source>Next &gt;</source>
             <translation>Next &gt;</translation>
         </message>
         <message>
-            <location filename="../gui/setup_wizard.py" line="60" />
+            <location filename="../gui/setup_wizard.py" line="62" />
             <source>Finish</source>
             <translation>Finish</translation>
         </message>
         <message>
-            <location filename="../gui/setup_wizard.py" line="61" />
+            <location filename="../gui/setup_wizard.py" line="63" />
             <source>Cancel</source>
             <translation>Cancel</translation>
         </message>
@@ -839,22 +876,22 @@
             <translation>System Language</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="51" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="55" />
             <source>Translation</source>
             <translation>Translation</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="60" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="64" />
             <source>Target Language:</source>
             <translation>Target Language:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="67" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="71" />
             <source>Font File:</source>
             <translation>Font File:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="70" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="74" />
             <source>Generate transcript for workflows</source>
             <translation>Generate transcript for workflows</translation>
         </message>

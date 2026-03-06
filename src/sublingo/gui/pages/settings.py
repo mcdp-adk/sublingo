@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
 from sublingo import __version__
 from sublingo.core.config import ConfigManager
 from sublingo.core.cookie import import_cookie_file, validate_cookie_file
+from sublingo.core.network_policy import resolve_http_proxy_from_values
 from sublingo.gui.config_options import AI_PROVIDER_PRESETS
 from sublingo.gui.widgets.ai_settings_widget import AISettingsWidget
 from sublingo.gui.widgets.ai_settings_widget import TestConnectionWorker
@@ -191,6 +192,7 @@ class SettingsPage(QWidget):
                 None,
             ),
             "ai_max_retries": getattr(ai_section, "ai_max_retries", None),
+            "proxy_mode": getattr(proxy_section, "proxy_mode", None),
             "proxy": getattr(proxy_section, "proxy", None),
             "language": getattr(gui_section, "gui_language", None),
             "debug_mode": getattr(maintenance_section, "debug_mode", None),
@@ -244,6 +246,7 @@ class SettingsPage(QWidget):
             "ai_proofread_batch_size": cfg.ai_proofread_batch_size,
             "ai_segment_batch_size": cfg.ai_segment_batch_size,
             "ai_max_retries": cfg.ai_max_retries,
+            "proxy_mode": cfg.proxy_mode,
             "proxy": cfg.proxy,
             "language": cfg.language,
             "debug_mode": cfg.debug_mode,
@@ -311,10 +314,16 @@ class SettingsPage(QWidget):
     def _on_test_connection(self) -> None:
         self._ai_section.test_conn_btn.setEnabled(False)
         self._ai_section.test_conn_btn.setText(self.tr("Testing..."))
+        policy = resolve_http_proxy_from_values(
+            str(self._read_widget_value("proxy_mode") or ""),
+            str(self._read_widget_value("proxy") or ""),
+        )
         worker = TestConnectionWorker(
             base_url=self._ai_section.ai_base_url.text(),
             api_key=self._ai_section.ai_api_key.text(),
             model=self._ai_section.ai_model.text(),
+            proxy=policy.proxy,
+            trust_env=policy.trust_env,
             parent=self,
         )
         worker.finished.connect(self._on_test_connection_result)

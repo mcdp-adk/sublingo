@@ -7,6 +7,7 @@ from typing import Any
 
 from sublingo.core.ai_client import AiClient
 from sublingo.core.config import AppConfig
+from sublingo.core.network_policy import resolve_http_proxy_policy
 from sublingo.core.constants import (
     AI_LANGUAGE_DETECT_SAMPLE_LENGTH,
     AI_TEMPERATURE_DEFAULT,
@@ -46,11 +47,13 @@ async def translate(
     out_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = out_dir / CHECKPOINT_FILENAME
 
+    policy = resolve_http_proxy_policy(ai_config)
     client = AiClient(
         base_url=ai_config.ai_base_url,
         api_key=ai_config.ai_api_key,
         model=ai_config.ai_model,
-        proxy=ai_config.proxy or None,
+        proxy=policy.proxy,
+        trust_env=policy.trust_env,
     )
     client.max_retries = ai_config.ai_max_retries
 

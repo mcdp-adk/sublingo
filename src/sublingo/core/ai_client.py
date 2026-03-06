@@ -32,6 +32,7 @@ class AiClient:
         api_key: str,
         model: str,
         proxy: str | None = None,
+        trust_env: bool = True,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -47,7 +48,7 @@ class AiClient:
                 "Content-Type": "application/json; charset=utf-8",
             },
             proxy=proxy,
-            trust_env=True,
+            trust_env=trust_env,
         )
 
     async def translate_batch(

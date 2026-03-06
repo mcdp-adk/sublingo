@@ -5,6 +5,7 @@ from typing import Any
 
 from sublingo.core.config import AppConfig
 from sublingo.core.downloader import download, extract_info
+from sublingo.core.network_policy import resolve_download_proxy
 from sublingo.core.ffmpeg import softsub
 from sublingo.core.font import subset_font
 from sublingo.core.models import ProgressCallback, ProjectStatus, WorkflowResult
@@ -48,8 +49,9 @@ async def run_workflow(
 ) -> WorkflowResult:
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    proxy = resolve_download_proxy(config)
     try:
-        info = extract_info(url, cookie_file=cookie_file, proxy=config.proxy or None)
+        info = extract_info(url, cookie_file=cookie_file, proxy=proxy)
     except Exception as exc:  # noqa: BLE001
         return WorkflowResult(
             success=False,
@@ -118,6 +120,7 @@ async def _run_from_project(
     progress: ProgressCallback | None,
     initial_title: str,
 ) -> WorkflowResult:
+    proxy = resolve_download_proxy(config)
     result = WorkflowResult(
         success=False,
         current_stage=STAGE_DOWNLOAD,
@@ -145,7 +148,7 @@ async def _run_from_project(
             url,
             output_dir=project_dir,
             cookie_file=cookie_file,
-            proxy=config.proxy or None,
+            proxy=proxy,
             progress=progress,
         )
         if result.download.video_title:

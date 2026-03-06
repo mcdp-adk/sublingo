@@ -126,6 +126,33 @@ def test_download_constructs_expected_yt_dlp_params(
     assert result.success is True
 
 
+def test_extract_info_sets_empty_proxy_to_disable_env_proxy(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setattr("sublingo.core.downloader.yt_dlp.YoutubeDL", FakeYoutubeDL)
+    FakeYoutubeDL.next_info = {
+        "webpage_url": "https://example.com/watch?v=abc",
+        "id": "abc",
+        "title": "Video Title",
+        "duration": 10,
+        "channel": "Channel",
+        "upload_date": "20260101",
+        "thumbnail": "https://example.com/thumb.jpg",
+        "view_count": 100,
+        "subtitles": {},
+        "automatic_captions": {},
+    }
+
+    extract_info(
+        "https://example.com/watch?v=abc",
+        cookie_file=Path("/tmp/cookies.txt"),
+        proxy="",
+    )
+
+    opts = FakeYoutubeDL.created_opts[-1]
+    assert opts["proxy"] == ""
+
+
 def test_progress_hook_maps_yt_dlp_payload(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ):

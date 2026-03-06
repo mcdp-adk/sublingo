@@ -16,12 +16,19 @@ from sublingo.core.config import (
     DEFAULT_AI_MODEL,
     DEFAULT_AI_PROVIDER,
     DEFAULT_FONT_FILE,
+    DEFAULT_PROXY_MODE,
+    PROXY_MODE_CUSTOM,
+    PROXY_MODE_DISABLED,
+    PROXY_MODE_SYSTEM,
 )
 from sublingo.core.constants import (
     AI_MAX_RETRIES,
     AI_PROOFREADING_BATCH_SIZE,
     AI_TRANSLATION_BATCH_SIZE,
 )
+from sublingo.core.network_policy import resolve_download_proxy
+from sublingo.core.network_policy import resolve_http_proxy_from_values
+from sublingo.core.network_policy import resolve_http_proxy_policy
 
 
 class TestAppConfig:
@@ -55,6 +62,7 @@ class TestAppConfig:
         assert config.ai_max_retries == AI_MAX_RETRIES
 
         # Network
+        assert config.proxy_mode == DEFAULT_PROXY_MODE
         assert config.proxy == ""
         assert config.batch_delay_seconds == 0
 
@@ -81,6 +89,7 @@ class TestAppConfig:
             "ai_proofread_batch_size",
             "ai_segment_batch_size",
             "ai_max_retries",
+            "proxy_mode",
             "proxy",
             "batch_delay_seconds",
             "language",
@@ -97,6 +106,7 @@ class TestAppConfig:
             generate_transcript=True,
             ai_provider="openai",
             ai_model="gpt-4",
+            proxy_mode=PROXY_MODE_CUSTOM,
             proxy="http://proxy.example.com:8080",
             debug_mode=True,
         )
@@ -107,6 +117,7 @@ class TestAppConfig:
         assert config.generate_transcript is True
         assert config.ai_provider == "openai"
         assert config.ai_model == "gpt-4"
+        assert config.proxy_mode == PROXY_MODE_CUSTOM
         assert config.proxy == "http://proxy.example.com:8080"
         assert config.debug_mode is True
 
@@ -163,6 +174,25 @@ class TestConfigManager:
         assert config.generate_transcript is True
         # Other fields should be defaults
         assert config.ai_model == DEFAULT_AI_MODEL
+
+    def test_load_infers_custom_proxy_mode_for_legacy_proxy(
+        self, manager: ConfigManager
+    ) -> None:
+        data = {"proxy": "http://127.0.0.1:7890"}
+        manager.config_file.write_text(json.dumps(data))
+
+        config = manager.load()
+
+        assert config.proxy_mode == PROXY_MODE_CUSTOM
+        assert config.proxy == "http://127.0.0.1:7890"
+
+    def test_load_normalizes_invalid_proxy_mode(self, manager: ConfigManager) -> None:
+        data = {"proxy_mode": "invalid"}
+        manager.config_file.write_text(json.dumps(data))
+
+        config = manager.load()
+
+        assert config.proxy_mode == PROXY_MODE_SYSTEM
 
     def test_load_filters_unknown_fields(self, manager: ConfigManager) -> None:
         """Test that unknown fields are filtered out."""
@@ -291,6 +321,50 @@ class TestConfigManager:
 
         resolved = manager.resolve_output_dir()
         assert resolved == Path(absolute_path).resolve()
+
+    def test_resolve_http_proxy_modes(self) -> None:
+        system_policy = resolve_http_proxy_policy(
+            AppConfig(proxy_mode=PROXY_MODE_SYSTEM, proxy="http://127.0.0.1:7890")
+        )
+        assert system_policy.proxy is None
+        assert system_policy.trust_env is True
+
+        custom_policy = resolve_http_proxy_policy(
+            AppConfig(proxy_mode=PROXY_MODE_CUSTOM, proxy="http://127.0.0.1:7890")
+        )
+        assert custom_policy.proxy == "http://127.0.0.1:7890"
+        assert custom_policy.trust_env is False
+
+        disabled_policy = resolve_http_proxy_policy(
+            AppConfig(proxy_mode=PROXY_MODE_DISABLED, proxy="http://127.0.0.1:7890")
+        )
+        assert disabled_policy.proxy is None
+        assert disabled_policy.trust_env is False
+
+    def test_resolve_http_proxy_from_values(self) -> None:
+        policy = resolve_http_proxy_from_values("custom", "http://127.0.0.1:7890")
+        assert policy.proxy == "http://127.0.0.1:7890"
+        assert policy.trust_env is False
+
+    def test_resolve_download_proxy_modes(self) -> None:
+        assert (
+            resolve_download_proxy(
+                AppConfig(proxy_mode=PROXY_MODE_SYSTEM, proxy="http://127.0.0.1:7890")
+            )
+            is None
+        )
+        assert (
+            resolve_download_proxy(
+                AppConfig(proxy_mode=PROXY_MODE_CUSTOM, proxy="http://127.0.0.1:7890")
+            )
+            == "http://127.0.0.1:7890"
+        )
+        assert (
+            resolve_download_proxy(
+                AppConfig(proxy_mode=PROXY_MODE_DISABLED, proxy="http://127.0.0.1:7890")
+            )
+            == ""
+        )
 
     def test_config_property_lazy_loads(self, manager: ConfigManager) -> None:
         """Test config property lazy loads on first access."""

@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+from PySide6.QtCore import QCoreApplication
+
 from sublingo.core.config import AI_PROVIDER_PRESETS
+from sublingo.core.config import PROXY_MODE_CUSTOM
+from sublingo.core.config import PROXY_MODE_DISABLED
+from sublingo.core.config import PROXY_MODE_SYSTEM
 
 
 PROVIDER_DISPLAY_NAMES: dict[str, str] = {
@@ -47,3 +52,23 @@ TARGET_LANGUAGES: dict[str, str] = {
     "pt": "Português",
     "ru": "Русский",
 }
+
+PROXY_MODE_OPTIONS: dict[str, str] = {
+    PROXY_MODE_SYSTEM: "Use System Proxy",
+    PROXY_MODE_CUSTOM: "Use Custom Proxy",
+    PROXY_MODE_DISABLED: "No Proxy",
+}
+
+
+def _register_proxy_i18n_keys() -> None:
+    QCoreApplication.translate("ProxyMode", "Use System Proxy")
+    QCoreApplication.translate("ProxyMode", "Use Custom Proxy")
+    QCoreApplication.translate("ProxyMode", "No Proxy")
+
+
+def format_proxy_mode_label(mode: str) -> str:
+    label = PROXY_MODE_OPTIONS.get(mode, "Use System Proxy")
+    return QCoreApplication.translate("ProxyMode", label)
+
+
+_register_proxy_i18n_keys()

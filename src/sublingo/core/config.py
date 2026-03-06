@@ -26,6 +26,10 @@ DEFAULT_AI_TRANSLATE_BATCH_SIZE: int = AI_TRANSLATION_BATCH_SIZE
 DEFAULT_AI_PROOFREAD_BATCH_SIZE: int = AI_PROOFREADING_BATCH_SIZE
 DEFAULT_AI_SEGMENT_BATCH_SIZE: int = AI_TRANSLATION_BATCH_SIZE
 DEFAULT_AI_MAX_RETRIES: int = AI_MAX_RETRIES
+PROXY_MODE_SYSTEM: str = "system"
+PROXY_MODE_CUSTOM: str = "custom"
+PROXY_MODE_DISABLED: str = "disabled"
+DEFAULT_PROXY_MODE: str = PROXY_MODE_SYSTEM
 DEFAULT_PROXY: str = ""
 DEFAULT_BATCH_DELAY_SECONDS: int = 0
 DEFAULT_GUI_LANGUAGE: str = "auto"
@@ -69,6 +73,7 @@ class AppConfig:
     ai_max_retries: int = DEFAULT_AI_MAX_RETRIES
 
     # Network
+    proxy_mode: str = DEFAULT_PROXY_MODE
     proxy: str = DEFAULT_PROXY  # Empty string means no proxy
     batch_delay_seconds: int = DEFAULT_BATCH_DELAY_SECONDS
 
@@ -82,6 +87,13 @@ _LANGUAGE_COMPAT_MAP: dict[str, str] = {
     "zh-CN": "zh-Hans",
     "zh-TW": "zh-Hant",
 }
+
+
+def normalize_proxy_mode(value: str | None) -> str:
+    mode = (value or "").strip().lower()
+    if mode in {PROXY_MODE_SYSTEM, PROXY_MODE_CUSTOM, PROXY_MODE_DISABLED}:
+        return mode
+    return DEFAULT_PROXY_MODE
 
 
 class ConfigManager:
@@ -137,6 +149,11 @@ class ConfigManager:
             data["target_language"] = _LANGUAGE_COMPAT_MAP.get(
                 data["target_language"], data["target_language"]
             )
+
+        if "proxy_mode" in data:
+            data["proxy_mode"] = normalize_proxy_mode(str(data["proxy_mode"]))
+        elif str(data.get("proxy") or "").strip():
+            data["proxy_mode"] = PROXY_MODE_CUSTOM
 
         # Filter out unknown fields
         known_fields = {f.name for f in fields(AppConfig)}

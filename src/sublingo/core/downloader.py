@@ -58,7 +58,7 @@ def _build_common_ydl_opts(
         "quiet": True,
         "no_warnings": False,
     }
-    if proxy:
+    if proxy is not None:
         opts["proxy"] = proxy
     return opts
 

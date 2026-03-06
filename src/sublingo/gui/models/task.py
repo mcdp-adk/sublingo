@@ -13,6 +13,7 @@ from sublingo.core.downloader import download
 from sublingo.core.ffmpeg import hardsub, softsub
 from sublingo.core.font import subset_font
 from sublingo.core.models import ProgressCallback
+from sublingo.core.network_policy import resolve_download_proxy
 from sublingo.core.transcript import generate_transcript
 from sublingo.core.translator import translate
 from sublingo.core.workflow import run_workflow
@@ -145,7 +146,7 @@ class TaskManager(QObject):
                 url,
                 output_dir=output_dir,
                 cookie_file=cookie_file,
-                proxy=task_config.proxy or None,
+                proxy=resolve_download_proxy(task_config),
                 progress=progress,
             )
         if task.task_type == TaskType.TRANSLATE:

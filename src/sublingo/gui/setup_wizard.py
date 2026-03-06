@@ -27,6 +27,8 @@ class SetupWizard(QWizard):
             default_provider=self._config_mgr.get_default("ai_provider") or "custom",
             default_base_url=self._config_mgr.get_default("ai_base_url") or "",
             default_model=self._config_mgr.get_default("ai_model") or "",
+            default_proxy_mode=self._config_mgr.get_default("proxy_mode") or "system",
+            default_proxy=self._config_mgr.get_default("proxy") or "",
         )
         self.other_page = OtherSettingsPage(config_mgr)
 
@@ -68,7 +70,8 @@ class SetupWizard(QWizard):
         cfg.ai_base_url = self.ai_page.ai_base_url.text()
         cfg.ai_api_key = self.ai_page.ai_api_key.text()
         cfg.ai_model = self.ai_page.ai_model.text()
+        cfg.proxy_mode = str(self.ai_page.proxy_mode.currentData() or cfg.proxy_mode)
+        cfg.proxy = self.ai_page.proxy_input.text()
         cfg.output_dir = self.other_page.output_dir.path() or cfg.output_dir
-        cfg.proxy = self.other_page.proxy_input.text()
         self._config_mgr.save(cfg)
         super().accept()

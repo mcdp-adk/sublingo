@@ -1,6 +1,6 @@
 [project]
 name = "sublingo"
-version = "0.0.3"
+version = "0.0.4"
 description = "PySide6 desktop tool for YouTube subtitle workflows"
 requires-python = ">=3.11"
 license = { text = "MIT" }

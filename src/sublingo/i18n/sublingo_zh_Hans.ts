@@ -3,60 +3,72 @@
     <context>
         <name>AIConfigPage</name>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="34" />
-            <location filename="../gui/wizards/ai_config_page.py" line="84" />
+            <location filename="../gui/wizards/ai_config_page.py" line="44" />
+            <location filename="../gui/wizards/ai_config_page.py" line="113" />
             <source>AI Configuration</source>
             <translation>AI 配置</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="35" />
-            <location filename="../gui/wizards/ai_config_page.py" line="85" />
+            <location filename="../gui/wizards/ai_config_page.py" line="45" />
+            <location filename="../gui/wizards/ai_config_page.py" line="114" />
             <source>Configure AI provider and API key.</source>
             <translation>配置 AI 提供商和 API 密钥。</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="38" />
-            <location filename="../gui/wizards/ai_config_page.py" line="86" />
+            <location filename="../gui/wizards/ai_config_page.py" line="48" />
+            <location filename="../gui/wizards/ai_config_page.py" line="115" />
             <source>Provider:</source>
             <translation>提供商:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="47" />
-            <location filename="../gui/wizards/ai_config_page.py" line="87" />
+            <location filename="../gui/wizards/ai_config_page.py" line="57" />
+            <location filename="../gui/wizards/ai_config_page.py" line="116" />
             <source>Base URL:</source>
             <translation>基础 URL:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="52" />
-            <location filename="../gui/wizards/ai_config_page.py" line="88" />
+            <location filename="../gui/wizards/ai_config_page.py" line="62" />
+            <location filename="../gui/wizards/ai_config_page.py" line="117" />
             <source>Model:</source>
             <translation>模型:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="57" />
-            <location filename="../gui/wizards/ai_config_page.py" line="89" />
+            <location filename="../gui/wizards/ai_config_page.py" line="67" />
+            <location filename="../gui/wizards/ai_config_page.py" line="118" />
             <source>API Key:</source>
             <translation>API 密钥:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="63" />
-            <location filename="../gui/wizards/ai_config_page.py" line="90" />
-            <location filename="../gui/wizards/ai_config_page.py" line="115" />
+            <location filename="../gui/wizards/ai_config_page.py" line="73" />
+            <location filename="../gui/wizards/ai_config_page.py" line="119" />
+            <source>Proxy Mode:</source>
+            <translation>代理模式：</translation>
+        </message>
+        <message>
+            <location filename="../gui/wizards/ai_config_page.py" line="81" />
+            <location filename="../gui/wizards/ai_config_page.py" line="120" />
+            <source>Proxy URL:</source>
+            <translation>代理地址：</translation>
+        </message>
+        <message>
+            <location filename="../gui/wizards/ai_config_page.py" line="87" />
+            <location filename="../gui/wizards/ai_config_page.py" line="124" />
+            <location filename="../gui/wizards/ai_config_page.py" line="159" />
             <source>Test Connection</source>
             <translation>测试连接</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="102" />
+            <location filename="../gui/wizards/ai_config_page.py" line="139" />
             <source>Testing...</source>
             <translation>测试中...</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="117" />
+            <location filename="../gui/wizards/ai_config_page.py" line="161" />
             <source>Connection Successful</source>
             <translation>连接成功</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/ai_config_page.py" line="119" />
+            <location filename="../gui/wizards/ai_config_page.py" line="163" />
             <source>Connection Failed</source>
             <translation>连接失败</translation>
         </message>
@@ -64,52 +76,52 @@
     <context>
         <name>AISettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="59" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="69" />
             <source>AI</source>
             <translation>AI</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="63" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="73" />
             <source>Provider:</source>
             <translation>提供商:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="66" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="76" />
             <source>Base URL:</source>
             <translation>基础 URL:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="69" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="79" />
             <source>Model:</source>
             <translation>模型:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="73" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="83" />
             <source>API Key:</source>
             <translation>API 密钥:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="79" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="89" />
             <source>Segmentation Batch Size:</source>
             <translation>断句批次：</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="89" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="99" />
             <source>Translation Batch Size:</source>
             <translation>翻译批次：</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="99" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="109" />
             <source>Proofreading Batch Size:</source>
             <translation>校对批次：</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="109" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="119" />
             <source>Max Retries:</source>
             <translation>最大重试：</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/ai_settings_widget.py" line="116" />
+            <location filename="../gui/widgets/ai_settings_widget.py" line="126" />
             <source>Test Connection</source>
             <translation>测试连接</translation>
         </message>
@@ -160,22 +172,22 @@
     <context>
         <name>CookieSettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="77" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="81" />
             <source>Cookie</source>
             <translation>Cookie</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="84" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="88" />
             <source>Text Files (*.txt)</source>
             <translation>文本文件 (*.txt)</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="87" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="91" />
             <source>Import</source>
             <translation>导入</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="89" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="93" />
             <source>Validate</source>
             <translation>验证</translation>
         </message>
@@ -215,12 +227,12 @@
             <translation>系统语言</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="34" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="38" />
             <source>GUI</source>
             <translation>界面</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="40" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="44" />
             <source>Interface Language:</source>
             <translation>界面语言:</translation>
         </message>
@@ -228,86 +240,86 @@
     <context>
         <name>HomePage</name>
         <message>
-            <location filename="../gui/pages/home.py" line="64" />
+            <location filename="../gui/pages/home.py" line="65" />
             <source>New Task</source>
             <translation>新建任务</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="68" />
+            <location filename="../gui/pages/home.py" line="69" />
             <source>Type:</source>
             <translation>任务类型：</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="89" />
+            <location filename="../gui/pages/home.py" line="90" />
             <source>Preview</source>
             <translation>预览</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="94" />
+            <location filename="../gui/pages/home.py" line="95" />
             <source>Create Task</source>
             <translation>创建任务</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="102" />
+            <location filename="../gui/pages/home.py" line="103" />
             <source>Active Tasks</source>
             <translation>进行中的任务</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="138" />
-            <location filename="../gui/pages/home.py" line="148" />
-            <location filename="../gui/pages/home.py" line="200" />
-            <location filename="../gui/pages/home.py" line="208" />
-            <location filename="../gui/pages/home.py" line="217" />
-            <location filename="../gui/pages/home.py" line="241" />
-            <location filename="../gui/pages/home.py" line="250" />
+            <location filename="../gui/pages/home.py" line="139" />
+            <location filename="../gui/pages/home.py" line="149" />
+            <location filename="../gui/pages/home.py" line="201" />
+            <location filename="../gui/pages/home.py" line="209" />
+            <location filename="../gui/pages/home.py" line="218" />
+            <location filename="../gui/pages/home.py" line="242" />
+            <location filename="../gui/pages/home.py" line="251" />
             <source>Error</source>
             <translation>错误</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="138" />
+            <location filename="../gui/pages/home.py" line="139" />
             <source>Cookie file is invalid</source>
             <translation>Cookie 文件无效</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="148" />
-            <location filename="../gui/pages/home.py" line="241" />
+            <location filename="../gui/pages/home.py" line="149" />
+            <location filename="../gui/pages/home.py" line="242" />
             <source>Please enter at least one URL</source>
             <translation>请至少输入一个 URL</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="158" />
+            <location filename="../gui/pages/home.py" line="159" />
             <source>Fetching video info...</source>
             <translation>正在获取视频信息…</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="159" />
+            <location filename="../gui/pages/home.py" line="160" />
             <source>Cancel</source>
             <translation>取消</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="191" />
+            <location filename="../gui/pages/home.py" line="192" />
             <source>Parsing URL ({current}/{total}):
 {url}</source>
             <translation>解析 URL（{current}/{total}）：
 {url}</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="200" />
+            <location filename="../gui/pages/home.py" line="201" />
             <source>No videos found</source>
             <translation>未找到视频</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="208" />
+            <location filename="../gui/pages/home.py" line="209" />
             <source>Please select at least one video</source>
             <translation>请至少选择一个视频</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="218" />
+            <location filename="../gui/pages/home.py" line="219" />
             <source>Failed to fetch video info: {error}</source>
             <translation>获取视频信息失败：{error}</translation>
         </message>
         <message>
-            <location filename="../gui/pages/home.py" line="251" />
+            <location filename="../gui/pages/home.py" line="252" />
             <source>Please fill in all required fields</source>
             <translation>请填写所有必填字段</translation>
         </message>
@@ -443,17 +455,17 @@
     <context>
         <name>MaintenanceSettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="121" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="136" />
             <source>Maintenance</source>
             <translation>维护</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="122" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="137" />
             <source>Enable debug mode (show verbose logs)</source>
             <translation>启用调试模式（显示详细日志）</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="126" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="141" />
             <source>Reset All Settings</source>
             <translation>重置所有设置</translation>
         </message>
@@ -461,84 +473,86 @@
     <context>
         <name>OtherSettingsPage</name>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="27" />
-            <location filename="../gui/wizards/other_settings_page.py" line="66" />
+            <location filename="../gui/wizards/other_settings_page.py" line="26" />
+            <location filename="../gui/wizards/other_settings_page.py" line="60" />
             <source>Other Settings</source>
             <translation>其他设置</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="28" />
-            <location filename="../gui/wizards/other_settings_page.py" line="67" />
             <source>Configure cookies, output directory, and proxy.</source>
             <translation>配置 Cookie、输出目录和代理。</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="31" />
-            <location filename="../gui/wizards/other_settings_page.py" line="68" />
+            <location filename="../gui/wizards/other_settings_page.py" line="30" />
+            <location filename="../gui/wizards/other_settings_page.py" line="62" />
             <source>Cookie File:</source>
             <translation>Cookie 文件:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="36" />
+            <location filename="../gui/wizards/other_settings_page.py" line="35" />
             <source>Text Files (*.txt)</source>
             <translation>文本文件 (*.txt)</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="39" />
-            <location filename="../gui/wizards/other_settings_page.py" line="69" />
+            <location filename="../gui/wizards/other_settings_page.py" line="38" />
+            <location filename="../gui/wizards/other_settings_page.py" line="63" />
             <source>Import</source>
             <translation>导入</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="42" />
-            <location filename="../gui/wizards/other_settings_page.py" line="70" />
+            <location filename="../gui/wizards/other_settings_page.py" line="41" />
+            <location filename="../gui/wizards/other_settings_page.py" line="64" />
             <source>Validate</source>
             <translation>验证</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="51" />
-            <location filename="../gui/wizards/other_settings_page.py" line="71" />
+            <location filename="../gui/wizards/other_settings_page.py" line="50" />
+            <location filename="../gui/wizards/other_settings_page.py" line="65" />
             <source>Output Directory:</source>
             <translation>输出目录:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="58" />
-            <location filename="../gui/wizards/other_settings_page.py" line="72" />
             <source>Proxy:</source>
             <translation>代理:</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="85" />
+            <location filename="../gui/wizards/other_settings_page.py" line="27" />
+            <location filename="../gui/wizards/other_settings_page.py" line="61" />
+            <source>Configure cookies and output directory.</source>
+            <translation>配置 Cookie 和输出目录。</translation>
+        </message>
+        <message>
+            <location filename="../gui/wizards/other_settings_page.py" line="78" />
             <source>Import Successful</source>
             <translation>导入成功</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="85" />
+            <location filename="../gui/wizards/other_settings_page.py" line="78" />
             <source>Cookie file imported.</source>
             <translation>Cookie 文件已导入。</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="91" />
+            <location filename="../gui/wizards/other_settings_page.py" line="84" />
             <source>Validation Passed</source>
             <translation>验证通过</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="93" />
+            <location filename="../gui/wizards/other_settings_page.py" line="86" />
             <source>Validation Failed</source>
             <translation>验证失败</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="99" />
+            <location filename="../gui/wizards/other_settings_page.py" line="92" />
             <source>Status: Not imported</source>
             <translation>状态: 未导入</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="105" />
+            <location filename="../gui/wizards/other_settings_page.py" line="98" />
             <source>Status: {} ({} bytes)</source>
             <translation>状态: {} ({} 字节)</translation>
         </message>
         <message>
-            <location filename="../gui/wizards/other_settings_page.py" line="109" />
+            <location filename="../gui/wizards/other_settings_page.py" line="102" />
             <source>Status: {}</source>
             <translation>状态: {}</translation>
         </message>
@@ -546,17 +560,17 @@
     <context>
         <name>OutputSettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="96" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="100" />
             <source>Output Paths</source>
             <translation>输出路径</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="100" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="104" />
             <source>Project Workspace Directory:</source>
             <translation>项目工作目录：</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="106" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="110" />
             <source>Final Output Directory:</source>
             <translation>最终输出目录：</translation>
         </message>
@@ -605,14 +619,37 @@
         </message>
     </context>
     <context>
+        <name>ProxyMode</name>
+        <message>
+            <location filename="../gui/config_options.py" line="64" />
+            <source>Use System Proxy</source>
+            <translation>使用系统代理</translation>
+        </message>
+        <message>
+            <location filename="../gui/config_options.py" line="65" />
+            <source>Use Custom Proxy</source>
+            <translation>使用自定义代理</translation>
+        </message>
+        <message>
+            <location filename="../gui/config_options.py" line="66" />
+            <source>No Proxy</source>
+            <translation>不使用代理</translation>
+        </message>
+    </context>
+    <context>
         <name>ProxySettingsWidget</name>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="113" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="117" />
             <source>Proxy</source>
             <translation>代理</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="116" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="121" />
+            <source>Proxy Mode:</source>
+            <translation>代理模式：</translation>
+        </message>
+        <message>
+            <location filename="../gui/widgets/settings_group_widgets.py" line="125" />
             <source>Proxy URL:</source>
             <translation>代理地址：</translation>
         </message>
@@ -620,92 +657,92 @@
     <context>
         <name>SettingsPage</name>
         <message>
-            <location filename="../gui/pages/settings.py" line="112" />
+            <location filename="../gui/pages/settings.py" line="113" />
             <source>Reset to default</source>
             <translation>重置为默认值</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="278" />
+            <location filename="../gui/pages/settings.py" line="281" />
             <source>Info</source>
             <translation>提示</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="279" />
+            <location filename="../gui/pages/settings.py" line="282" />
             <source>Interface language saved. Restart the app to apply changes.</source>
             <translation>界面语言已保存，重启应用后生效。</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="313" />
+            <location filename="../gui/pages/settings.py" line="316" />
             <source>Testing...</source>
             <translation>测试中...</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="326" />
+            <location filename="../gui/pages/settings.py" line="335" />
             <source>Test Connection</source>
             <translation>测试连接</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="328" />
+            <location filename="../gui/pages/settings.py" line="337" />
             <source>Connection Successful</source>
             <translation>连接成功</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="330" />
+            <location filename="../gui/pages/settings.py" line="339" />
             <source>Connection Failed</source>
             <translation>连接失败</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="340" />
+            <location filename="../gui/pages/settings.py" line="349" />
             <source>Import Successful</source>
             <translation>导入成功</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="341" />
+            <location filename="../gui/pages/settings.py" line="350" />
             <source>Cookie file updated</source>
             <translation>Cookie 文件已更新</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="347" />
+            <location filename="../gui/pages/settings.py" line="356" />
             <source>Validation Passed</source>
             <translation>验证通过</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="349" />
+            <location filename="../gui/pages/settings.py" line="358" />
             <source>Validation Failed</source>
             <translation>验证失败</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="356" />
+            <location filename="../gui/pages/settings.py" line="365" />
             <source>Cookie status: not imported</source>
             <translation>Cookie 状态：未导入</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="363" />
+            <location filename="../gui/pages/settings.py" line="372" />
             <source>Cookie status: {} ({} bytes)</source>
             <translation>Cookie 状态：{}（{} 字节）</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="370" />
+            <location filename="../gui/pages/settings.py" line="379" />
             <source>Cookie status: {}</source>
             <translation>Cookie 状态：{}</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="377" />
+            <location filename="../gui/pages/settings.py" line="386" />
             <source>Confirm Reset</source>
             <translation>确认重置</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="379" />
+            <location filename="../gui/pages/settings.py" line="388" />
             <source>Reset all settings? This will delete config.json and requires restarting the app.</source>
             <translation>确定要重置所有设置吗？这将删除 config.json 并需要重启应用。</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="388" />
+            <location filename="../gui/pages/settings.py" line="397" />
             <source>Reset Complete</source>
             <translation>已重置</translation>
         </message>
         <message>
-            <location filename="../gui/pages/settings.py" line="390" />
+            <location filename="../gui/pages/settings.py" line="399" />
             <source>Settings reset complete. Please restart the app to apply changes.</source>
             <translation>设置已重置，请重启应用以生效。</translation>
         </message>
@@ -714,27 +751,27 @@
         <name>SetupWizard</name>
         <message>
             <location filename="../gui/setup_wizard.py" line="21" />
-            <location filename="../gui/setup_wizard.py" line="54" />
+            <location filename="../gui/setup_wizard.py" line="56" />
             <source>Sublingo Setup Wizard</source>
             <translation>Sublingo 设置向导</translation>
         </message>
         <message>
-            <location filename="../gui/setup_wizard.py" line="58" />
+            <location filename="../gui/setup_wizard.py" line="60" />
             <source>&lt; Back</source>
             <translation>&lt; 上一步</translation>
         </message>
         <message>
-            <location filename="../gui/setup_wizard.py" line="59" />
+            <location filename="../gui/setup_wizard.py" line="61" />
             <source>Next &gt;</source>
             <translation>下一步 &gt;</translation>
         </message>
         <message>
-            <location filename="../gui/setup_wizard.py" line="60" />
+            <location filename="../gui/setup_wizard.py" line="62" />
             <source>Finish</source>
             <translation>完成</translation>
         </message>
         <message>
-            <location filename="../gui/setup_wizard.py" line="61" />
+            <location filename="../gui/setup_wizard.py" line="63" />
             <source>Cancel</source>
             <translation>取消</translation>
         </message>
@@ -839,22 +876,22 @@
             <translation>系统语言</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="51" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="55" />
             <source>Translation</source>
             <translation>翻译</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="60" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="64" />
             <source>Target Language:</source>
             <translation>目标语言:</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="67" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="71" />
             <source>Font File:</source>
             <translation>字体文件：</translation>
         </message>
         <message>
-            <location filename="../gui/widgets/settings_group_widgets.py" line="70" />
+            <location filename="../gui/widgets/settings_group_widgets.py" line="74" />
             <source>Generate transcript for workflows</source>
             <translation>全流程时生成转录</translation>
         </message>

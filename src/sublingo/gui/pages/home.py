@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
 
 from sublingo.core.config import ConfigManager
 from sublingo.core.cookie import validate_cookie_file
+from sublingo.core.network_policy import resolve_download_proxy
 from sublingo.gui.models.task import TaskManager
 from sublingo.gui.models.task_info import format_status_summary
 from sublingo.gui.models.task_info import format_task_title
@@ -169,7 +170,7 @@ class HomePage(QWidget):
         worker = PreviewFetchWorker(
             urls,
             cookie_file=self._config_mgr.cookie_file,
-            proxy=self._config_mgr.config.proxy or None,
+            proxy=resolve_download_proxy(self._config_mgr.config),
             parent=self,
         )
         self._preview_worker = worker

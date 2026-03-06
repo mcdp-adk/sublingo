@@ -13,7 +13,11 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sublingo.core.config import PROXY_MODE_CUSTOM
+from sublingo.core.config import PROXY_MODE_DISABLED
+from sublingo.core.config import PROXY_MODE_SYSTEM
 from sublingo.gui.config_options import format_language_option_label
+from sublingo.gui.config_options import format_proxy_mode_label
 from sublingo.gui.config_options import GUI_LANGUAGES
 from sublingo.gui.config_options import TARGET_LANGUAGES
 from sublingo.gui.widgets.file_picker import FilePicker
@@ -111,9 +115,20 @@ class OutputSettingsWidget(SettingsSection):
 class ProxySettingsWidget(SettingsSection):
     def __init__(self, row_builder: RowBuilder, parent: QWidget | None = None) -> None:
         super().__init__(self.tr("Proxy"), parent)
+        self.proxy_mode = QComboBox()
+        for mode in (PROXY_MODE_SYSTEM, PROXY_MODE_CUSTOM, PROXY_MODE_DISABLED):
+            self.proxy_mode.addItem(format_proxy_mode_label(mode), mode)
+        self.add_row(row_builder(self.tr("Proxy Mode:"), self.proxy_mode, "proxy_mode"))
+
         self.proxy = QLineEdit()
         self.proxy.setPlaceholderText("http://127.0.0.1:7890")
         self.add_row(row_builder(self.tr("Proxy URL:"), self.proxy, "proxy"))
+        self.proxy_mode.currentIndexChanged.connect(self._sync_proxy_enabled_state)
+        self._sync_proxy_enabled_state()
+
+    def _sync_proxy_enabled_state(self) -> None:
+        is_custom = self.proxy_mode.currentData() == PROXY_MODE_CUSTOM
+        self.proxy.setEnabled(bool(is_custom))
 
 
 class MaintenanceSettingsWidget(SettingsSection):

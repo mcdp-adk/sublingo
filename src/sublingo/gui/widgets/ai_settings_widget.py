@@ -22,12 +22,20 @@ class TestConnectionWorker(QThread):
     finished = Signal(bool, str)
 
     def __init__(
-        self, base_url: str, api_key: str, model: str, parent: QObject | None = None
+        self,
+        base_url: str,
+        api_key: str,
+        model: str,
+        proxy: str | None,
+        trust_env: bool,
+        parent: QObject | None = None,
     ) -> None:
         super().__init__(parent)
         self._base_url = base_url
         self._api_key = api_key
         self._model = model
+        self._proxy = proxy
+        self._trust_env = trust_env
 
     def run(self) -> None:
         try:
@@ -38,6 +46,8 @@ class TestConnectionWorker(QThread):
                     base_url=self._base_url,
                     api_key=self._api_key,
                     model=self._model,
+                    proxy=self._proxy,
+                    trust_env=self._trust_env,
                 )
                 try:
                     return await client.test_connection()

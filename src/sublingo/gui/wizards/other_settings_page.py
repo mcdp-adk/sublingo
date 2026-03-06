@@ -5,7 +5,6 @@ from pathlib import Path
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
-    QLineEdit,
     QMessageBox,
     QPushButton,
     QVBoxLayout,
@@ -25,7 +24,7 @@ class OtherSettingsPage(QWizardPage):
         super().__init__(parent)
         self._config_mgr = config_mgr
         self.setTitle(self.tr("Other Settings"))
-        self.setSubTitle(self.tr("Configure cookies, output directory, and proxy."))
+        self.setSubTitle(self.tr("Configure cookies and output directory."))
 
         layout = QVBoxLayout(self)
         self._cookie_label = QLabel(self.tr("Cookie File:"))
@@ -55,21 +54,15 @@ class OtherSettingsPage(QWizardPage):
         self.output_dir.set_path(str(default_output_dir or ""))
         layout.addWidget(self.output_dir)
 
-        self._proxy_label = QLabel(self.tr("Proxy:"))
-        layout.addWidget(self._proxy_label)
-        self.proxy_input = QLineEdit()
-        self.proxy_input.setPlaceholderText("socks5://127.0.0.1:1080")
-        layout.addWidget(self.proxy_input)
         layout.addStretch(1)
 
     def retranslateUi(self) -> None:
         self.setTitle(self.tr("Other Settings"))
-        self.setSubTitle(self.tr("Configure cookies, output directory, and proxy."))
+        self.setSubTitle(self.tr("Configure cookies and output directory."))
         self._cookie_label.setText(self.tr("Cookie File:"))
         self.import_btn.setText(self.tr("Import"))
         self.validate_btn.setText(self.tr("Validate"))
         self._output_label.setText(self.tr("Output Directory:"))
-        self._proxy_label.setText(self.tr("Proxy:"))
         self._update_cookie_status()
 
     def _on_import(self) -> None:
