@@ -7,9 +7,10 @@ from PySide6.QtCore import QObject, Qt, Signal
 
 from sublingo.core.config import AppConfig, ConfigManager
 from sublingo.core.models import DownloadResult
-from sublingo.gui.models.task import TaskManager, TaskStatus, TaskType
-from sublingo.gui.pages.home import PreviewDialog, PreviewVideoRow
+from sublingo.gui.models.task import TaskManager
+from sublingo.gui.models.task_types import TaskStatus, TaskType
 from sublingo.gui.pages.tasks import TasksPage
+from sublingo.gui.widgets.batch_preview_dialog import PreviewDialog, PreviewVideoRow
 
 
 class _ManualWorker(QObject):

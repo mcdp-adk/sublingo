@@ -16,6 +16,7 @@ from PySide6.QtCore import QCoreApplication, QThread, Signal, SignalInstance
 from sublingo.core.models import ProgressCallback
 from sublingo.gui.workers.task_worker import (
     AsyncTaskWorker,
+    CallableTaskWorker,
     TaskWorker,
     WorkerCallback,
 )
@@ -277,3 +278,46 @@ class TestAsyncTaskWorker:
         worker = AsyncTaskWorker(_async_task, "input_val")
         assert worker.task_fn is _async_task
         assert worker.task_input == "input_val"
+
+
+def test_callable_task_worker_emits_legacy_signals() -> None:
+    progress_calls: list[tuple[int, int, str, dict[str, Any]]] = []
+    log_calls: list[tuple[str, str, str]] = []
+    results: list[Any] = []
+
+    def _runner(progress: Any) -> str:
+        progress.on_progress(1, 2, "working", stage="download")
+        progress.on_log("info", "runner log", "detail")
+        return "done"
+
+    worker = CallableTaskWorker(_runner)
+    worker.progress.connect(
+        lambda c, t, m, meta: progress_calls.append((c, t, m, meta))
+    )
+    worker.log.connect(lambda lvl, msg, det: log_calls.append((lvl, msg, det)))
+    worker.result_ready.connect(results.append)
+
+    worker.start()
+    _wait_for_thread(worker)
+
+    assert progress_calls == [(1, 2, "working", {"stage": "download"})]
+    assert log_calls == [("info", "runner log", "detail")]
+    assert results == ["done"]
+
+
+def test_callable_task_worker_emits_task_error_for_awaitable_failure() -> None:
+    errors: list[BaseException] = []
+
+    async def _failing_runner(_progress: Any) -> str:
+        await asyncio.sleep(0)
+        raise RuntimeError("callable fail")
+
+    worker = CallableTaskWorker(_failing_runner)
+    worker.task_error.connect(errors.append)
+
+    worker.start()
+    _wait_for_thread(worker)
+
+    assert len(errors) == 1
+    assert isinstance(errors[0], RuntimeError)
+    assert str(errors[0]) == "callable fail"

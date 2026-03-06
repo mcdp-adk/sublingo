@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import asyncio
-import inspect
-import uuid
 from collections.abc import Callable
-from dataclasses import dataclass, field, replace
-from datetime import datetime, timezone
-from enum import Enum
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from PySide6.QtCore import QObject, QThread, QTimer, Signal
+from PySide6.QtCore import QObject, QTimer, Signal
 
 from sublingo.core.config import AppConfig
 from sublingo.core.config import ConfigManager
@@ -21,269 +16,21 @@ from sublingo.core.models import ProgressCallback
 from sublingo.core.transcript import generate_transcript
 from sublingo.core.translator import translate
 from sublingo.core.workflow import run_workflow
+from sublingo.gui.models.task_info import TaskInfo
+from sublingo.gui.models.task_info import normalize_path_text
+from sublingo.gui.models.task_types import BACKEND_STAGE_TO_DISPLAY
+from sublingo.gui.models.task_types import DEFAULT_STAGE_BY_TASK
+from sublingo.gui.models.task_types import TASK_STAGES
+from sublingo.gui.models.task_types import TaskStatus
+from sublingo.gui.models.task_types import TaskType
+from sublingo.gui.workers.task_worker import CallableTaskWorker
 
 TASK_PERSISTENCE_FILENAME: str = "tasks.json"
 GLOSSARIES_DIRNAME: str = "glossaries"
 FONTS_DIRNAME: str = "fonts"
-DEFAULT_FAILURE_MESSAGE: str = "任务失败"
-DEFAULT_WORKER_ERROR_MESSAGE: str = "无法创建任务 worker"
-STAGE_PENDING: str = "pending"
-STAGE_ACTIVE: str = "active"
-STAGE_DONE: str = "done"
-STAGE_ERROR: str = "error"
+DEFAULT_FAILURE_MESSAGE: str = "Task failed"
+DEFAULT_WORKER_ERROR_MESSAGE: str = "Failed to create task worker"
 MILLISECONDS_PER_SECOND: int = 1000
-
-
-class TaskType(Enum):
-    WORKFLOW = "workflow"
-    DOWNLOAD = "download"
-    TRANSLATE = "translate"
-    SOFTSUB = "softsub"
-    HARDSUB = "hardsub"
-    TRANSCRIPT = "transcript"
-    FONT_SUBSET = "font_subset"
-
-
-class TaskStatus(Enum):
-    QUEUED = "queued"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-
-
-TASK_TYPE_DISPLAY: dict[TaskType, str] = {
-    TaskType.WORKFLOW: "完整工作流",
-    TaskType.DOWNLOAD: "仅下载",
-    TaskType.TRANSLATE: "仅翻译",
-    TaskType.SOFTSUB: "仅软字幕",
-    TaskType.HARDSUB: "仅硬字幕",
-    TaskType.TRANSCRIPT: "仅转录",
-    TaskType.FONT_SUBSET: "仅字体子集化",
-}
-
-
-TASK_STAGES: dict[TaskType, list[str]] = {
-    TaskType.WORKFLOW: ["下载", "翻译", "字体子集", "软字幕", "转录"],
-    TaskType.DOWNLOAD: ["下载"],
-    TaskType.TRANSLATE: ["分段", "翻译", "校对"],
-    TaskType.SOFTSUB: ["软字幕"],
-    TaskType.HARDSUB: ["硬字幕"],
-    TaskType.TRANSCRIPT: ["转录"],
-    TaskType.FONT_SUBSET: ["字体子集"],
-}
-
-_DEFAULT_STAGE_BY_TASK: dict[TaskType, str] = {
-    TaskType.DOWNLOAD: "download",
-    TaskType.SOFTSUB: "softsub",
-    TaskType.HARDSUB: "hardsub",
-    TaskType.TRANSCRIPT: "transcript",
-    TaskType.FONT_SUBSET: "font_subset",
-}
-
-_BACKEND_STAGE_TO_DISPLAY: dict[str, str] = {
-    "download": "下载",
-    "downloading": "下载",
-    "finished": "下载",
-    "segment": "分段",
-    "segmenting": "分段",
-    "translate": "翻译",
-    "translating": "翻译",
-    "proofread": "校对",
-    "proofreading": "校对",
-    "font": "字体子集",
-    "font_subset": "字体子集",
-    "softsub": "软字幕",
-    "mux": "软字幕",
-    "hardsub": "硬字幕",
-    "burn": "硬字幕",
-    "transcript": "转录",
-    "complete": "完成",
-}
-
-
-def _normalize_path_text(value: Any) -> str:
-    if isinstance(value, str):
-        return value
-    if isinstance(value, Path):
-        return str(value)
-    return ""
-
-
-def _describe_task(task: "TaskInfo") -> str:
-    for key in ("url", "subtitle_file", "video_file", "font_file"):
-        value = _normalize_path_text(task.params.get(key))
-        if not value:
-            continue
-        if key == "url":
-            return value
-        return Path(value).name
-    return ""
-
-
-@dataclass
-class TaskInfo:
-    id: str = field(default_factory=lambda: uuid.uuid4().hex[:8])
-    task_type: TaskType = TaskType.WORKFLOW
-    params: dict[str, Any] = field(default_factory=dict)
-    status: TaskStatus = TaskStatus.QUEUED
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    stages: list[str] = field(default_factory=list)
-    stage_statuses: dict[str, str] = field(default_factory=dict)
-    current_stage: str = ""
-    progress_percent: int = 0
-    progress_message: str = ""
-    meta: dict[str, Any] = field(default_factory=dict)
-    result: Any = None
-    error: str | None = None
-    video_title: str = ""
-
-    def __post_init__(self) -> None:
-        if not self.stages:
-            self.stages = list(TASK_STAGES.get(self.task_type, []))
-
-        normalized_statuses = {
-            stage: self.stage_statuses.get(stage, STAGE_PENDING)
-            for stage in self.stages
-        }
-        self.stage_statuses = normalized_statuses
-
-        if self.current_stage and self.current_stage not in self.stage_statuses:
-            self.current_stage = ""
-
-    @property
-    def display_name(self) -> str:
-        task_name = TASK_TYPE_DISPLAY.get(self.task_type, "任务")
-        suffix = self.video_title or _describe_task(self)
-        if not suffix:
-            return task_name
-        return f"{task_name}  {suffix}"
-
-    @property
-    def status_summary(self) -> str:
-        if self.status == TaskStatus.COMPLETED:
-            return "完成"
-        if self.status == TaskStatus.FAILED:
-            return "失败"
-        if self.status == TaskStatus.RUNNING and self.current_stage:
-            if self.progress_percent > 0:
-                return f"{self.current_stage} {self.progress_percent}%"
-            return self.current_stage
-        return "排队中"
-
-    def mark_running(self) -> None:
-        self.status = TaskStatus.RUNNING
-        self.error = None
-        if self.stages and not self.current_stage:
-            self.current_stage = self.stages[0]
-        if self.current_stage in self.stage_statuses:
-            self.stage_statuses[self.current_stage] = STAGE_ACTIVE
-
-    def update_progress(
-        self,
-        *,
-        current: int,
-        total: int,
-        message: str,
-        meta: dict[str, Any],
-        stage_name: str | None,
-    ) -> None:
-        self.progress_message = message
-        self.meta = dict(meta)
-
-        if stage_name and stage_name in self.stage_statuses:
-            self._activate_stage(stage_name)
-            stage_status = str(meta.get("stage_status") or "")
-            if stage_status == STAGE_DONE:
-                self.stage_statuses[stage_name] = STAGE_DONE
-
-        active_stage = stage_name or self.current_stage
-        if total > 0 and active_stage in self.stages:
-            stage_index = self.stages.index(active_stage)
-            stage_width = 100 / max(len(self.stages), 1)
-            base_progress = int(stage_index * stage_width)
-            stage_progress = int((current / total) * stage_width)
-            self.progress_percent = min(base_progress + stage_progress, 99)
-
-    def mark_completed(self, result: Any = None) -> None:
-        self.status = TaskStatus.COMPLETED
-        self.result = result
-        self.error = None
-        self.progress_percent = 100
-        if self.stages:
-            self.current_stage = self.stages[-1]
-        for stage in self.stages:
-            self.stage_statuses[stage] = STAGE_DONE
-
-    def mark_failed(
-        self, error: str, *, failed_stage: str | None = None, result: Any = None
-    ) -> None:
-        self.status = TaskStatus.FAILED
-        self.error = error
-        self.result = result
-        self.progress_message = error
-
-        if failed_stage and failed_stage in self.stage_statuses:
-            self.current_stage = failed_stage
-            self.stage_statuses[failed_stage] = STAGE_ERROR
-        elif self.current_stage in self.stage_statuses:
-            self.stage_statuses[self.current_stage] = STAGE_ERROR
-
-    def _activate_stage(self, stage_name: str) -> None:
-        self.current_stage = stage_name
-        for stage in self.stages:
-            if stage == stage_name:
-                break
-            if self.stage_statuses[stage] != STAGE_DONE:
-                self.stage_statuses[stage] = STAGE_DONE
-        self.stage_statuses[stage_name] = STAGE_ACTIVE
-
-
-class _WorkerProgressCallback:
-    def __init__(
-        self,
-        progress_signal: Any,
-        log_signal: Any,
-    ) -> None:
-        self._progress_signal = progress_signal
-        self._log_signal = log_signal
-
-    def on_progress(
-        self, current: int, total: int, message: str = "", **meta: Any
-    ) -> None:
-        self._progress_signal.emit(current, total, message, dict(meta))
-
-    def on_log(self, level: str, message: str, detail: str = "") -> None:
-        self._log_signal.emit(level, message, detail)
-
-
-class _TaskWorker(QThread):
-    progress = Signal(int, int, str, dict)
-    log = Signal(str, str, str)
-    result_ready = Signal(object)
-    task_error = Signal(object)
-
-    def __init__(
-        self,
-        runner: Callable[[ProgressCallback | None], Any],
-        parent: QObject | None = None,
-    ) -> None:
-        super().__init__(parent)
-        self._runner = runner
-
-    def run(self) -> None:
-        callback = _WorkerProgressCallback(self.progress, self.log)
-        try:
-            outcome = self._runner(callback)
-            if inspect.isawaitable(outcome):
-                outcome = asyncio.run(self._await_outcome(outcome))
-        except Exception as exc:  # noqa: BLE001
-            self.task_error.emit(exc)
-            return
-
-        self.result_ready.emit(outcome)
-
-    async def _await_outcome(self, outcome: Any) -> Any:
-        return await outcome
 
 
 class TaskManager(QObject):
@@ -307,8 +54,7 @@ class TaskManager(QObject):
         )
         self._tasks = self._load_tasks()
         self._order = list(self._tasks)
-        self._current_worker: _TaskWorker | QObject | None = None
-        self._current_task_id: str | None = None
+        self._current_worker: CallableTaskWorker | QObject | None = None
         self._next_task_timer: QTimer | None = None
 
     @property
@@ -334,12 +80,9 @@ class TaskManager(QObject):
     def _try_run_next(self) -> None:
         if self._current_worker is not None:
             return
-
         for task_id in self._order:
             task = self._tasks.get(task_id)
-            if task is None:
-                continue
-            if task.status == TaskStatus.QUEUED:
+            if task is not None and task.status == TaskStatus.QUEUED:
                 self._run_task(task_id)
                 return
 
@@ -355,7 +98,6 @@ class TaskManager(QObject):
 
         task.mark_running()
         self._current_worker = worker
-        self._current_task_id = task_id
         self._persist_tasks()
         self.task_started.emit(task_id)
 
@@ -371,11 +113,11 @@ class TaskManager(QObject):
         worker.task_error.connect(lambda exc: self._on_error(task_id, exc))
         worker.start()
 
-    def _create_worker(self, task: TaskInfo) -> _TaskWorker | None:
+    def _create_worker(self, task: TaskInfo) -> CallableTaskWorker | None:
         runner = self._build_runner(task)
         if runner is None:
             return None
-        return _TaskWorker(runner, self)
+        return CallableTaskWorker(runner, self)
 
     def _build_runner(
         self, task: TaskInfo
@@ -397,7 +139,6 @@ class TaskManager(QObject):
                 output_dir=output_dir,
                 progress=progress,
             )
-
         if task.task_type == TaskType.DOWNLOAD:
             url = str(task.params["url"])
             return lambda progress: download(
@@ -407,7 +148,6 @@ class TaskManager(QObject):
                 proxy=task_config.proxy or None,
                 progress=progress,
             )
-
         if task.task_type == TaskType.TRANSLATE:
             subtitle_path = Path(str(task.params["subtitle_file"]))
             return lambda progress: translate(
@@ -418,7 +158,6 @@ class TaskManager(QObject):
                 output_dir=output_dir,
                 progress=progress,
             )
-
         if task.task_type == TaskType.SOFTSUB:
             video_path = Path(str(task.params["video_file"]))
             subtitle_path = Path(str(task.params["subtitle_file"]))
@@ -432,7 +171,6 @@ class TaskManager(QObject):
                 output_dir=output_dir,
                 progress=progress,
             )
-
         if task.task_type == TaskType.HARDSUB:
             video_path = Path(str(task.params["video_file"]))
             subtitle_path = Path(str(task.params["subtitle_file"]))
@@ -446,14 +184,12 @@ class TaskManager(QObject):
                 output_dir=output_dir,
                 progress=progress,
             )
-
         if task.task_type == TaskType.TRANSCRIPT:
             subtitle_path = Path(str(task.params["subtitle_file"]))
             return lambda _progress: generate_transcript(
                 subtitle_path,
                 output_dir=output_dir,
             )
-
         if task.task_type == TaskType.FONT_SUBSET:
             subtitle_path = Path(str(task.params["subtitle_file"]))
             font_path = self._resolve_font_path(
@@ -466,16 +202,19 @@ class TaskManager(QObject):
                 font_path,
                 output_dir=output_dir,
             )
-
         return None
 
     def _on_progress(
-        self, task_id: str, current: int, total: int, message: str, meta: dict[str, Any]
+        self,
+        task_id: str,
+        current: int,
+        total: int,
+        message: str,
+        meta: dict[str, Any],
     ) -> None:
         task = self._tasks.get(task_id)
         if task is None:
             return
-
         stage_name = self._map_stage_name(
             task,
             backend_stage=str(meta.get("stage") or ""),
@@ -499,7 +238,6 @@ class TaskManager(QObject):
         if task is None:
             self._cleanup_worker()
             return
-
         task.result = result
         video_title = getattr(result, "video_title", "")
         if video_title:
@@ -528,10 +266,9 @@ class TaskManager(QObject):
         if task is None:
             self._cleanup_worker()
             return
-
         failed_stage = self._map_stage_name(
             task,
-            backend_stage=_DEFAULT_STAGE_BY_TASK.get(task.task_type, ""),
+            backend_stage=DEFAULT_STAGE_BY_TASK.get(task.task_type, ""),
             message=task.progress_message,
         )
         error_message = str(exc)
@@ -567,16 +304,16 @@ class TaskManager(QObject):
     def _map_stage_name(
         self, task: TaskInfo, *, backend_stage: str, message: str
     ) -> str | None:
-        candidate = backend_stage or _DEFAULT_STAGE_BY_TASK.get(task.task_type, "")
-        stage_name = _BACKEND_STAGE_TO_DISPLAY.get(candidate)
-
+        stage_name = BACKEND_STAGE_TO_DISPLAY.get(
+            backend_stage or DEFAULT_STAGE_BY_TASK.get(task.task_type, "")
+        )
         message_lower = message.lower()
         if stage_name is None and "proofread" in message_lower:
-            stage_name = "校对"
+            stage_name = "Proofread"
         if stage_name is None and "translat" in message_lower:
-            stage_name = "翻译"
+            stage_name = "Translate"
         if stage_name is None and "download" in message_lower:
-            stage_name = "下载"
+            stage_name = "Download"
         if stage_name is None and "ffmpeg" in message_lower:
             stage_name = TASK_STAGES[task.task_type][0]
 
@@ -628,7 +365,7 @@ class TaskManager(QObject):
         return None
 
     def _resolve_font_path(self, value: Any, task_config: AppConfig) -> Path | None:
-        raw_value = _normalize_path_text(value)
+        raw_value = normalize_path_text(value)
         if raw_value:
             candidate = Path(raw_value)
             if candidate.exists():
@@ -637,7 +374,6 @@ class TaskManager(QObject):
         font_dir = self._resolve_font_dir()
         if font_dir is None:
             return None
-
         default_candidate = font_dir / task_config.font_file
         if default_candidate.exists():
             return default_candidate.resolve()
@@ -653,15 +389,85 @@ class TaskManager(QObject):
 
         save_tasks(self._tasks, self._persistence_path)
 
+    def resume_workflow(self, task_id: str) -> bool:
+        """Resume a failed workflow task from checkpoint.
+
+        Args:
+            task_id: The ID of the task to resume
+
+        Returns:
+            True if resume was initiated, False otherwise
+        """
+        from sublingo.core.workflow import resume_workflow
+
+        task = self._tasks.get(task_id)
+        if task is None:
+            return False
+        if task.task_type != TaskType.WORKFLOW:
+            return False
+        if task.status != TaskStatus.FAILED:
+            return False
+
+        # Extract project_dir from task params or meta
+        project_dir = self._resolve_project_dir(task)
+        if project_dir is None:
+            return False
+
+        # Build runner for resume_workflow
+        task_config = self._build_task_config(task)
+        cookie_file = self._config_mgr.cookie_file
+        output_dir = self._resolve_output_dir(task.params)
+        glossary_dir = self._resolve_glossary_dir()
+        font_dir = self._resolve_font_dir()
+
+        runner = lambda progress: resume_workflow(
+            project_dir,
+            config=task_config,
+            cookie_file=cookie_file,
+            glossary_dir=glossary_dir,
+            font_dir=font_dir,
+            output_dir=output_dir,
+            progress=progress,
+        )
+
+        # Create and run worker
+        worker = CallableTaskWorker(runner, self)
+
+        # Reset task state for resume
+        task.mark_running()
+        task.error = None
+        self._current_worker = worker
+        self._persist_tasks()
+        self.task_started.emit(task_id)
+
+        worker.progress.connect(
+            lambda current, total, message, meta: self._on_progress(
+                task_id, current, total, message, meta
+            )
+        )
+        worker.log.connect(
+            lambda level, message, detail: self._on_log(task_id, level, message, detail)
+        )
+        worker.result_ready.connect(lambda result: self._on_finished(task_id, result))
+        worker.task_error.connect(lambda exc: self._on_error(task_id, exc))
+        worker.start()
+
+        return True
+
+    def _resolve_project_dir(self, task: TaskInfo) -> Path | None:
+        project_dir = task.meta.get("project_dir") or task.params.get("project_dir")
+        if project_dir:
+            candidate = Path(str(project_dir))
+            if candidate.exists():
+                return candidate
+        return None
+
     def _cleanup_worker(self) -> None:
         worker = self._current_worker
         self._current_worker = None
-        self._current_task_id = None
         if worker is None:
             return
-        wait = getattr(worker, "wait", None)
-        if callable(wait):
+        if callable(wait := getattr(worker, "wait", None)):
             wait()
-        delete_later = getattr(worker, "deleteLater", None)
-        if callable(delete_later):
+        if callable(delete_later := getattr(worker, "deleteLater", None)):
             delete_later()

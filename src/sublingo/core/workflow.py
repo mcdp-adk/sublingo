@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from sublingo.core.config import AppConfig
 from sublingo.core.downloader import download, extract_info
@@ -26,10 +27,12 @@ STAGE_COMPLETE: str = "complete"
 INVALID_PATH_CHARS: str = '<>:"/\\|?*'
 
 
-def detect_project_status(project_dir: Path) -> ProjectStatus:
+def detect_project_status(
+    project_dir: Path, target_lang: str | None = None
+) -> ProjectStatus:
     return _detect_project_status(
         project_dir=project_dir,
-        target_lang=AppConfig().target_language,
+        target_lang=target_lang or AppConfig().target_language,
     )
 
 
@@ -127,7 +130,13 @@ async def _run_from_project(
     )
 
     result.current_stage = STAGE_DOWNLOAD
-    _emit_stage(progress, stage=STAGE_DOWNLOAD, stage_status="active", stage_index=1)
+    _emit_stage(
+        progress,
+        stage=STAGE_DOWNLOAD,
+        stage_status="active",
+        stage_index=1,
+        project_dir=str(project_dir),
+    )
     if not status.has_video or not status.has_subtitle:
         if not url:
             result.error = "Download prerequisites missing and URL is unavailable"
@@ -253,6 +262,7 @@ def _emit_stage(
     stage: str,
     stage_status: str,
     stage_index: int,
+    **meta: Any,
 ) -> None:
     if progress is None:
         return
@@ -262,6 +272,7 @@ def _emit_stage(
         message=stage,
         stage=stage,
         stage_status=stage_status,
+        **meta,
     )
 
 

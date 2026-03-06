@@ -86,6 +86,12 @@ class MainWindow(QMainWindow):
         settings_page = SettingsPage(config_mgr)
         self.set_page("settings", settings_page)
 
+        # -- Connect signals --------------------------------------------------
+        settings_page.debug_mode_changed.connect(
+            tasks_page.detail_widget.log_viewer.set_debug_mode
+        )
+        home_page.navigate_requested.connect(self._navigate_to_page)
+
         # -- Status bar -------------------------------------------------------
         self._status_bar = QStatusBar()
         self.setStatusBar(self._status_bar)

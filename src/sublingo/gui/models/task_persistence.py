@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import fields, is_dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from sublingo.gui.models.task import STAGE_ERROR
-from sublingo.gui.models.task import TaskInfo
-from sublingo.gui.models.task import TaskStatus
-from sublingo.gui.models.task import TaskType
+logger = logging.getLogger(__name__)
+
+from sublingo.gui.models.task_info import TaskInfo
+from sublingo.gui.models.task_types import STAGE_ERROR
+from sublingo.gui.models.task_types import TaskStatus
+from sublingo.gui.models.task_types import TaskType
 
 TASKS_PAYLOAD_KEY: str = "tasks"
 INTERRUPTED_TASK_ERROR: str = "应用关闭时任务仍在运行"
@@ -121,5 +124,5 @@ def _parse_datetime(raw_value: Any) -> datetime:
         try:
             return datetime.fromisoformat(raw_value)
         except ValueError:
-            pass
+            logger.debug("Failed to parse datetime from value: %r", raw_value)
     return datetime.now(timezone.utc)

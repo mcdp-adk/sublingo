@@ -8,6 +8,7 @@ from PySide6.QtGui import QFontDatabase
 from PySide6.QtWidgets import QApplication
 
 from sublingo.core.config import ConfigManager
+from sublingo.gui.i18n_utils import load_translator
 from sublingo.gui.main_window import MainWindow
 
 
@@ -29,6 +30,8 @@ def main() -> int:
     app = QApplication(sys.argv)
     project_root = Path(__file__).resolve().parent.parent.parent
     config_mgr = ConfigManager(project_root)
+
+    load_translator(app, config_mgr.config.language)
 
     # Load project font to fix missing glyphs in WSL/Linux
     font_path = project_root / "fonts" / "LXGWWenKai-Regular.ttf"

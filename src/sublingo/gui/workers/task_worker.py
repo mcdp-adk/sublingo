@@ -11,9 +11,10 @@ log messages back to the GUI thread in a thread-safe manner.
 from __future__ import annotations
 
 import asyncio
+import inspect
 from typing import Any, Callable, Protocol
 
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QObject, QThread, Signal
 
 
 # ---------------------------------------------------------------------------
@@ -153,3 +154,33 @@ class AsyncTaskWorker(QThread):
             self.finished.emit(result)
         except Exception as exc:
             self.error.emit(exc)
+
+
+class CallableTaskWorker(QThread):
+    progress = Signal(int, int, str, dict)
+    log = Signal(str, str, str)
+    result_ready = Signal(object)
+    task_error = Signal(object)
+
+    def __init__(
+        self,
+        runner: Callable[[Any], Any],
+        parent: QObject | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self._runner = runner
+
+    def run(self) -> None:
+        callback = WorkerCallback(self.progress, self.log)
+        try:
+            result = self._runner(callback)
+            if inspect.isawaitable(result):
+                result = asyncio.run(self._await_result(result))
+        except Exception as exc:  # noqa: BLE001
+            self.task_error.emit(exc)
+            return
+
+        self.result_ready.emit(result)
+
+    async def _await_result(self, result: Any) -> Any:
+        return await result

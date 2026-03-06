@@ -5,19 +5,19 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QGroupBox, QWizard
 
 from sublingo.gui.main_window import MainWindow
+from sublingo.gui.models.task_types import TaskType
 from sublingo.gui.pages.home import HomePage
 from sublingo.gui.pages.settings import SettingsPage
-from sublingo.gui.models.task import TaskType
 from sublingo.gui.setup_wizard import SetupWizard
 
 SETTINGS_SECTION_TITLES = {
     "GUI",
-    "翻译",
+    "Translation",
     "Cookie",
-    "输出路径",
+    "Output Paths",
     "AI",
-    "代理",
-    "维护",
+    "Proxy",
+    "Maintenance",
 }
 
 WIZARD_TITLES = [

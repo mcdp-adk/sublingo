@@ -8,11 +8,11 @@ from PySide6.QtCore import QCoreApplication, QObject, Signal
 
 from sublingo.core.config import ConfigManager
 from sublingo.core.models import DownloadResult
-from sublingo.gui.models.task import TASK_STAGES
-from sublingo.gui.models.task import TaskInfo
 from sublingo.gui.models.task import TaskManager
-from sublingo.gui.models.task import TaskStatus
-from sublingo.gui.models.task import TaskType
+from sublingo.gui.models.task_info import TaskInfo
+from sublingo.gui.models.task_types import TASK_STAGES
+from sublingo.gui.models.task_types import TaskStatus
+from sublingo.gui.models.task_types import TaskType
 from sublingo.gui.models.task_persistence import load_tasks
 from sublingo.gui.models.task_persistence import save_tasks
 
@@ -51,36 +51,36 @@ def test_task_info_state_transitions() -> None:
     assert task.status == TaskStatus.QUEUED
     assert task.stages == TASK_STAGES[TaskType.TRANSLATE]
     assert task.stage_statuses == {
-        "分段": "pending",
-        "翻译": "pending",
-        "校对": "pending",
+        "Segment": "pending",
+        "Translate": "pending",
+        "Proofread": "pending",
     }
 
     task.mark_running()
 
     assert task.status == TaskStatus.RUNNING
-    assert task.current_stage == "分段"
-    assert task.stage_statuses["分段"] == "active"
+    assert task.current_stage == "Segment"
+    assert task.stage_statuses["Segment"] == "active"
 
     task.update_progress(
         current=1,
         total=2,
         message="Translating batch 1/2",
         meta={"stage": "translating"},
-        stage_name="翻译",
+        stage_name="Translate",
     )
 
-    assert task.current_stage == "翻译"
-    assert task.stage_statuses["分段"] == "done"
-    assert task.stage_statuses["翻译"] == "active"
+    assert task.current_stage == "Translate"
+    assert task.stage_statuses["Segment"] == "done"
+    assert task.stage_statuses["Translate"] == "active"
     assert task.progress_percent == 49
 
-    task.mark_failed("boom", failed_stage="校对")
+    task.mark_failed("boom", failed_stage="Proofread")
 
     assert task.status == TaskStatus.FAILED
     assert task.error == "boom"
-    assert task.current_stage == "校对"
-    assert task.stage_statuses["校对"] == "error"
+    assert task.current_stage == "Proofread"
+    assert task.stage_statuses["Proofread"] == "error"
 
     completed = TaskInfo(
         task_type=TaskType.DOWNLOAD, params={"url": "https://example.com"}
@@ -90,7 +90,7 @@ def test_task_info_state_transitions() -> None:
 
     assert completed.status == TaskStatus.COMPLETED
     assert completed.progress_percent == 100
-    assert completed.stage_statuses == {"下载": "done"}
+    assert completed.stage_statuses == {"Download": "done"}
 
 
 def test_task_manager_create_queue_and_run_lifecycle(
@@ -141,7 +141,7 @@ def test_task_manager_create_queue_and_run_lifecycle(
 
     first_task = manager.get_task(first_id)
     assert first_task is not None
-    assert first_task.current_stage == "下载"
+    assert first_task.current_stage == "Download"
     assert first_task.progress_percent == 50
 
     workers[first_id].result_ready.emit(
@@ -199,14 +199,14 @@ def test_task_manager_loads_persisted_tasks_on_startup(tmp_path: Path) -> None:
         },
         status=TaskStatus.COMPLETED,
         created_at=created_at,
-        current_stage="软字幕",
+        current_stage="Softsub",
         progress_percent=100,
         progress_message="done",
         meta={"output_path": tmp_path / "video.softsub.mkv"},
         result={"output_path": tmp_path / "video.softsub.mkv"},
         video_title="Demo",
     )
-    finished.stage_statuses["软字幕"] = "done"
+    finished.stage_statuses["Softsub"] = "done"
 
     save_tasks({queued.id: queued, finished.id: finished}, persistence_path)
 

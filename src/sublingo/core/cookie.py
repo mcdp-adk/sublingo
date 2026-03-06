@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import json
+import logging
 import shutil
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 def validate_cookie_file(path: Path) -> tuple[bool, str]:
@@ -61,7 +64,7 @@ def _is_json_format(content: str) -> bool:
         if isinstance(data, list) and data:
             return isinstance(data[0], dict)
     except (json.JSONDecodeError, IndexError):
-        pass
+        logger.debug("Content is not valid JSON format: %s", content[:100])
     return False
 
 

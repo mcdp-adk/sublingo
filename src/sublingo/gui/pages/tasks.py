@@ -17,7 +17,8 @@ from PySide6.QtWidgets import (
     QProgressBar,
 )
 
-from sublingo.gui.models.task import TaskManager, TaskStatus
+from sublingo.gui.models.task import TaskManager
+from sublingo.gui.models.task_types import TaskStatus
 from sublingo.gui.widgets.log_viewer import LogViewer
 from sublingo.gui.widgets.stepper import Stepper
 
@@ -85,7 +86,7 @@ class TaskDetailWidget(QWidget):
         layout.addWidget(self.stage_detail_label)
 
         # Continue button
-        self.continue_btn = QPushButton(self.tr("继续"))
+        self.continue_btn = QPushButton(self.tr("Continue"))
         self.continue_btn.hide()
         layout.addWidget(self.continue_btn)
 
