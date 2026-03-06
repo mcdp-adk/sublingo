@@ -1,0 +1,30 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- /home/joe/sublingo-work/.venv/bin/python
+cachedir: .pytest_cache
+PySide6 6.10.2 -- Qt runtime 6.10.2 -- Qt compiled 6.10.2
+rootdir: /home/joe/sublingo-work
+configfile: pyproject.toml
+plugins: qt-4.5.0, asyncio-0.26.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 18 items
+
+tests/test_models.py::TestProgressCallback::test_progress_callback_can_be_implemented PASSED [  5%]
+tests/test_models.py::TestVideoInfo::test_video_info_creation PASSED     [ 11%]
+tests/test_models.py::TestDownloadResult::test_download_result_success PASSED [ 16%]
+tests/test_models.py::TestDownloadResult::test_download_result_failure PASSED [ 22%]
+tests/test_models.py::TestDownloadResult::test_download_result_default_warnings PASSED [ 27%]
+tests/test_models.py::TestTranslateResult::test_translate_result_creation PASSED [ 33%]
+tests/test_models.py::TestFontSubsetResult::test_font_subset_result_creation PASSED [ 38%]
+tests/test_models.py::TestTranscriptResult::test_transcript_result_creation PASSED [ 44%]
+tests/test_models.py::TestMuxResult::test_mux_result_creation PASSED     [ 50%]
+tests/test_models.py::TestBurnResult::test_burn_result_creation PASSED   [ 55%]
+tests/test_models.py::TestStreamInfo::test_stream_info_creation PASSED   [ 61%]
+tests/test_models.py::TestStreamInfo::test_stream_info_optional_fields PASSED [ 66%]
+tests/test_models.py::TestProjectStatus::test_project_status_defaults PASSED [ 72%]
+tests/test_models.py::TestProjectStatus::test_project_status_creation PASSED [ 77%]
+tests/test_models.py::TestWorkflowResult::test_workflow_result_creation PASSED [ 83%]
+tests/test_models.py::TestWorkflowResult::test_workflow_result_default_warnings PASSED [ 88%]
+tests/test_models.py::TestSubtitleEntry::test_subtitle_entry_creation PASSED [ 94%]
+tests/test_models.py::TestBilingualEntry::test_bilingual_entry_creation PASSED [100%]
+
+============================== 18 passed in 0.03s ==============================
