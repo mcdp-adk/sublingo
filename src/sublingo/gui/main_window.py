@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 )
 
 from sublingo.core.config import ConfigManager
+from sublingo.gui.models.task import TaskManager
 from sublingo.gui.pages.home import HomePage
 from sublingo.gui.pages.settings import SettingsPage
 from sublingo.gui.pages.tasks import TasksPage
@@ -27,6 +28,7 @@ class MainWindow(QMainWindow):
     ) -> None:
         super().__init__(parent)
         self._config_mgr = config_mgr
+        self._task_mgr = TaskManager(config_mgr, self)
 
         self.setWindowTitle(self.tr("sublingo"))
         self.setMinimumSize(900, 600)
@@ -75,13 +77,13 @@ class MainWindow(QMainWindow):
         self._build_sidebar()
 
         # -- Replace placeholders with real pages -----------------------------
-        home_page = HomePage()
+        home_page = HomePage(config_mgr, self._task_mgr)
         self.set_page("home", home_page)
 
-        tasks_page = TasksPage()
+        tasks_page = TasksPage(self._task_mgr)
         self.set_page("tasks", tasks_page)
 
-        settings_page = SettingsPage()
+        settings_page = SettingsPage(config_mgr)
         self.set_page("settings", settings_page)
 
         # -- Status bar -------------------------------------------------------

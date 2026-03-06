@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- /home/joe/sublingo-work/.venv/bin/python
+cachedir: .pytest_cache
+PySide6 6.10.2 -- Qt runtime 6.10.2 -- Qt compiled 6.10.2
+rootdir: /home/joe/sublingo-work
+configfile: pyproject.toml
+plugins: qt-4.5.0, asyncio-0.26.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 3 items
+
+tests/test_task_model.py::test_task_info_state_transitions PASSED        [ 33%]
+tests/test_task_model.py::test_task_manager_create_queue_and_run_lifecycle PASSED [ 66%]
+tests/test_task_model.py::test_task_manager_loads_persisted_tasks_on_startup PASSED [100%]
+
+============================== 3 passed in 0.34s ===============================

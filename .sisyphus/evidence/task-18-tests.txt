@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- /home/joe/sublingo-work/.venv/bin/python
+cachedir: .pytest_cache
+PySide6 6.10.2 -- Qt runtime 6.10.2 -- Qt compiled 6.10.2
+rootdir: /home/joe/sublingo-work
+configfile: pyproject.toml
+plugins: qt-4.5.0, asyncio-0.26.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 15 items
+
+tests/test_workers.py::TestWorkerCallback::test_on_progress_emits_signal PASSED [  6%]
+tests/test_workers.py::TestWorkerCallback::test_on_progress_default_message PASSED [ 13%]
+tests/test_workers.py::TestWorkerCallback::test_on_log_emits_signal PASSED [ 20%]
+tests/test_workers.py::TestWorkerCallback::test_on_log_default_detail PASSED [ 26%]
+tests/test_workers.py::TestWorkerCallback::test_satisfies_progress_callback_protocol PASSED [ 33%]
+tests/test_workers.py::TestTaskWorker::test_finished_signal_emitted PASSED [ 40%]
+tests/test_workers.py::TestTaskWorker::test_progress_signal_emitted PASSED [ 46%]
+tests/test_workers.py::TestTaskWorker::test_log_signal_emitted PASSED    [ 53%]
+tests/test_workers.py::TestTaskWorker::test_error_signal_on_exception PASSED [ 60%]
+tests/test_workers.py::TestTaskWorker::test_stores_task_fn_and_input PASSED [ 66%]
+tests/test_workers.py::TestAsyncTaskWorker::test_finished_signal_emitted PASSED [ 73%]
+tests/test_workers.py::TestAsyncTaskWorker::test_progress_signal_emitted PASSED [ 80%]
+tests/test_workers.py::TestAsyncTaskWorker::test_log_signal_emitted PASSED [ 86%]
+tests/test_workers.py::TestAsyncTaskWorker::test_error_signal_on_exception PASSED [ 93%]
+tests/test_workers.py::TestAsyncTaskWorker::test_stores_task_fn_and_input PASSED [100%]
+
+============================== 15 passed in 0.03s ==============================
