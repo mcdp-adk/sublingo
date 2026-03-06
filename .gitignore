@@ -214,3 +214,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Runtime / User data
+config.json
+tasks.json
+cookies.txt
+output/
+*.log

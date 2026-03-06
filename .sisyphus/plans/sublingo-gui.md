@@ -226,7 +226,7 @@ Max Concurrent: 5 (Wave 2-3)
 
 ## TODOs
 
-- [ ] 1. Project Scaffolding + Rules Update + Tech Validation
+- [x] 1. Project Scaffolding + Rules Update + Tech Validation
 
   **What to do**:
   - Create `pyproject.toml` with all dependencies:
@@ -352,7 +352,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `pyproject.toml`, `src/sublingo/**`, `tests/**`, `AGENTS.md`, `.sisyphus/rules/python-runtime.md`
   - Pre-commit: `uv run pytest`
 
-- [ ] 2. Core Data Models + Constants + ProgressCallback Protocol
+- [x] 2. Core Data Models + Constants + ProgressCallback Protocol
 
   **What to do**:
   - Create `src/sublingo/core/models.py` with all dataclasses:
@@ -451,7 +451,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/models.py`, `src/sublingo/core/constants.py`, `tests/test_models.py`
   - Pre-commit: `uv run pytest`
 
-- [ ] 3. Copy Fonts + Create Example Glossary
+- [x] 3. Copy Fonts + Create Example Glossary
 
   **What to do**:
   - Copy 3 font files from `/home/joe/sublingo-legacy/fonts/` to `fonts/`:
@@ -520,7 +520,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `fonts/*.ttf`, `glossaries/example.csv`
   - Pre-commit: `uv run pytest`
 
-- [ ] 4. Config Module + Tests
+- [x] 4. Config Module + Tests
 
   **What to do**:
   - Create `src/sublingo/core/config.py`:
@@ -605,7 +605,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/config.py`, `src/sublingo/core/cookie.py`, `tests/test_config.py`, `tests/test_cookie.py`
   - Pre-commit: `uv run pytest`
 
-- [ ] 5. Subtitle Module + Tests
+- [x] 5. Subtitle Module + Tests
 
   **What to do**:
   - Create `src/sublingo/core/subtitle.py`:
@@ -679,7 +679,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/subtitle.py`, `tests/test_subtitle.py`, `tests/fixtures/sample*.vtt`, `tests/fixtures/sample*.srt`
   - Pre-commit: `uv run pytest`
 
-- [ ] 6. Transcript Module + Tests
+- [x] 6. Transcript Module + Tests
 
   **What to do**:
   - Create `src/sublingo/core/transcript.py`:
@@ -732,7 +732,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/transcript.py`, `tests/test_transcript.py`
   - Pre-commit: `uv run pytest`
 
-- [ ] 7. Downloader Module + Tests
+- [x] 7. Downloader Module + Tests
 
   **What to do**:
   - Create `src/sublingo/core/downloader.py`:
@@ -826,7 +826,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/downloader.py`, `tests/test_downloader.py`
   - Pre-commit: `uv run pytest`
 
-- [ ] 8. Font Module + Tests
+- [x] 8. Font Module + Tests
 
   **What to do**:
   - Create `src/sublingo/core/font.py`:
@@ -890,7 +890,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/font.py`, `tests/test_font.py`
   - Pre-commit: `uv run pytest`
 
-- [ ] 9. FFmpeg Module + Tests
+- [x] 9. FFmpeg Module + Tests
 
   **What to do**:
   - Create `src/sublingo/core/ffmpeg.py`:
@@ -970,7 +970,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/ffmpeg.py`, `tests/test_ffmpeg.py`
   - Pre-commit: `uv run pytest`
 
-- [ ] 10. Translator Module + Tests
+- [x] 10. Translator Module + Tests
 
   **What to do**:
   - Create `src/sublingo/core/ai_client.py`:
@@ -1075,7 +1075,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/ai_client.py`, `src/sublingo/core/translator.py`, `src/sublingo/core/glossary.py`, `tests/test_ai_client.py`, `tests/test_glossary.py`, `tests/test_translator.py`
   - Pre-commit: `uv run pytest`
 
-- [ ] 11. Workflow Module + Tests
+- [x] 11. Workflow Module + Tests
 
   **What to do**:
   - Create `src/sublingo/core/workflow.py`:
@@ -1146,7 +1146,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/core/workflow.py`, `tests/test_workflow.py`
   - Pre-commit: `uv run pytest`
 
-- [ ] 12. i18n Infrastructure + Translation Files
+- [x] 12. i18n Infrastructure + Translation Files
 
   **What to do**:
   - Create `src/sublingo/i18n/` translation infrastructure:
@@ -1211,7 +1211,7 @@ Max Concurrent: 5 (Wave 2-3)
   - Files: `src/sublingo/gui/i18n_utils.py`, `src/sublingo/i18n/*.ts`, `src/sublingo/i18n/*.qm`
   - Pre-commit: `uv run pytest`
 
-- [ ] 13. GUI Scaffolding + Main Window + Navigation
+- [x] 13. GUI Scaffolding + Main Window + Navigation
 
   **What to do**:
   - Create `src/sublingo/__main__.py`: Entry point that launches QApplication, loads font (LXGWWenKai-Regular for CJK), checks first_run → Setup Wizard or Main Window
@@ -1253,7 +1253,7 @@ Max Concurrent: 5 (Wave 2-3)
   **Commit**: YES
   - Message: `feat(gui): scaffold main window with sidebar navigation`
 
-- [ ] 14. Setup Wizard
+- [x] 14. Setup Wizard
 
   **What to do**:
   - Create `src/sublingo/gui/setup_wizard.py`: QWizard with 3 pages:
@@ -1301,7 +1301,7 @@ Max Concurrent: 5 (Wave 2-3)
   **Commit**: YES
   - Message: `feat(gui): implement Setup Wizard (language, AI, other settings)`
 
-- [ ] 15. Settings Page
+- [x] 15. Settings Page
 
   **What to do**:
   - Implement `src/sublingo/gui/pages/settings.py`: Full settings page with grouped sections in QScrollArea:
@@ -1353,7 +1353,7 @@ Max Concurrent: 5 (Wave 2-3)
   **Commit**: YES
   - Message: `feat(gui): implement Settings page with all config sections`
 
-- [ ] 16. Home Page -- Task Creation
+- [x] 16. Home Page -- Task Creation
 
   **What to do**:
   - Implement `src/sublingo/gui/pages/home.py`: Task creation interface:
@@ -1406,7 +1406,7 @@ Max Concurrent: 5 (Wave 2-3)
   **Commit**: YES
   - Message: `feat(gui): implement Home page for task creation`
 
-- [ ] 17. Task Models + Persistence + TaskManager
+- [x] 17. Task Models + Persistence + TaskManager
 
   **What to do**:
   - Create `src/sublingo/gui/models/task.py`:
@@ -1461,7 +1461,7 @@ Max Concurrent: 5 (Wave 2-3)
   **Commit**: YES
   - Message: `feat(gui): implement task models, persistence, and TaskManager`
 
-- [ ] 18. Workers (TaskWorker + AsyncTaskWorker + WorkerCallback)
+- [x] 18. Workers (TaskWorker + AsyncTaskWorker + WorkerCallback)
 
   **What to do**:
   - Create `src/sublingo/gui/workers/task_worker.py`:
@@ -1506,7 +1506,7 @@ Max Concurrent: 5 (Wave 2-3)
   **Commit**: YES
   - Message: `feat(gui): implement TaskWorker, AsyncTaskWorker, WorkerCallback`
 
-- [ ] 19. Tasks Page -- Monitoring + Stepper + Details
+- [x] 19. Tasks Page -- Monitoring + Stepper + Details
 
   **What to do**:
   - Implement `src/sublingo/gui/pages/tasks.py`: Task monitoring interface:
@@ -1559,7 +1559,7 @@ Max Concurrent: 5 (Wave 2-3)
   **Commit**: YES
   - Message: `feat(gui): implement Tasks page with stepper and detail views`
 
-- [ ] 20. Batch Processing Integration
+- [x] 20. Batch Processing Integration
 
   **What to do**:
   - Add batch processing support to Home page and TaskManager:
@@ -1608,7 +1608,7 @@ Max Concurrent: 5 (Wave 2-3)
   **Commit**: YES
   - Message: `feat(gui): integrate batch processing with preview and rate limiting`
 
-- [ ] 21. GUI Smoke Tests
+- [x] 21. GUI Smoke Tests
 
   **What to do**:
   - Create `tests/test_gui_smoke.py`:
