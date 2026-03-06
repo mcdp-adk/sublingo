@@ -1,0 +1,22 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- /home/joe/sublingo-work/.venv/bin/python
+cachedir: .pytest_cache
+PySide6 6.10.2 -- Qt runtime 6.10.2 -- Qt compiled 6.10.2
+rootdir: /home/joe/sublingo-work
+configfile: pyproject.toml
+plugins: qt-4.5.0, asyncio-0.26.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 10 items
+
+tests/test_transcript.py::test_vtt_input_produces_correct_transcript PASSED [ 10%]
+tests/test_transcript.py::test_srt_input_produces_correct_transcript PASSED [ 20%]
+tests/test_transcript.py::test_duplicate_lines_are_deduplicated PASSED   [ 30%]
+tests/test_transcript.py::test_output_file_naming_follows_convention PASSED [ 40%]
+tests/test_transcript.py::test_output_dir_parameter_works_correctly PASSED [ 50%]
+tests/test_transcript.py::test_default_output_dir_is_subtitle_parent PASSED [ 60%]
+tests/test_transcript.py::test_empty_subtitle_file_returns_error PASSED  [ 70%]
+tests/test_transcript.py::test_file_not_found_returns_error PASSED       [ 80%]
+tests/test_transcript.py::test_all_duplicates_returns_error PASSED       [ 90%]
+tests/test_transcript.py::test_whitespace_only_entries_are_filtered PASSED [100%]
+
+============================== 10 passed in 0.04s ==============================
