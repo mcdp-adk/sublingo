@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- /home/joe/sublingo-work/.venv/bin/python
+cachedir: .pytest_cache
+PySide6 6.10.2 -- Qt runtime 6.10.2 -- Qt compiled 6.10.2
+rootdir: /home/joe/sublingo-work
+configfile: pyproject.toml
+plugins: qt-4.5.0, asyncio-0.26.0, anyio-4.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 5 items
+
+tests/test_font.py::test_subset_font_creates_smaller_font_than_original PASSED [ 20%]
+tests/test_font.py::test_subset_font_contains_all_characters_from_subtitle PASSED [ 40%]
+tests/test_font.py::test_subset_font_uses_expected_output_file_naming PASSED [ 60%]
+tests/test_font.py::test_empty_subtitle_produces_minimal_subset PASSED   [ 80%]
+tests/test_font.py::test_subset_font_preserves_cjk_characters PASSED     [100%]
+
+============================== 5 passed in 0.95s ===============================
