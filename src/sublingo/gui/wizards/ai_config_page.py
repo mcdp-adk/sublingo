@@ -5,7 +5,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -20,6 +19,9 @@ from sublingo.gui.config_options import AI_PROVIDER_PRESETS
 from sublingo.gui.config_options import format_provider_label
 from sublingo.gui.config_options import format_proxy_mode_label
 from sublingo.gui.widgets.ai_settings_widget import TestConnectionWorker
+from sublingo.gui.widgets.dialogs import create_busy_dialog
+from sublingo.gui.widgets.dialogs import show_info_dialog
+from sublingo.gui.widgets.dialogs import show_warning_dialog
 
 
 class AIConfigPage(QWizardPage):
@@ -35,6 +37,7 @@ class AIConfigPage(QWizardPage):
     ) -> None:
         super().__init__(parent)
         self._workers: list[TestConnectionWorker] = []
+        self._busy_dialog = None
         self._default_provider = default_provider
         self._default_base_url = default_base_url
         self._default_model = default_model
@@ -136,6 +139,10 @@ class AIConfigPage(QWizardPage):
     def _on_test(self) -> None:
         self.test_btn.setEnabled(False)
         self.test_btn.setText(self.tr("Testing..."))
+        self._show_busy(
+            self.tr("Testing AI Connection"),
+            self.tr("Testing AI connection, please wait..."),
+        )
         policy = resolve_http_proxy_from_values(
             str(self.proxy_mode.currentData() or PROXY_MODE_SYSTEM),
             self.proxy_input.text(),
@@ -146,16 +153,54 @@ class AIConfigPage(QWizardPage):
             model=self.ai_model.text(),
             proxy=policy.proxy,
             trust_env=policy.trust_env,
-            parent=self,
+            parent=None,
         )
         worker.finished.connect(self._on_test_result)
-        self._workers.append(worker)
+        self._register_worker(worker)
+        self._set_wizard_nav_enabled(False)
         worker.start()
 
     def _on_test_result(self, success: bool, message: str) -> None:
         self.test_btn.setEnabled(True)
         self.test_btn.setText(self.tr("Test Connection"))
+        self._hide_busy()
+        self._set_wizard_nav_enabled(True)
         if success:
-            QMessageBox.information(self, self.tr("Connection Successful"), message)
+            show_info_dialog(self, self.tr("Connection Successful"), message)
         else:
-            QMessageBox.warning(self, self.tr("Connection Failed"), message)
+            show_warning_dialog(self, self.tr("Connection Failed"), message)
+
+    def _show_busy(self, title: str, label: str) -> None:
+        self._hide_busy()
+        dialog = create_busy_dialog(self, title, label)
+        dialog.show()
+        self._busy_dialog = dialog
+
+    def _hide_busy(self) -> None:
+        if self._busy_dialog is None:
+            return
+        self._busy_dialog.close()
+        self._busy_dialog.deleteLater()
+        self._busy_dialog = None
+
+    def _register_worker(self, worker: TestConnectionWorker) -> None:
+        self._workers.append(worker)
+        worker.finished.connect(lambda *_: self._finalize_worker(worker))
+
+    def _finalize_worker(self, worker: TestConnectionWorker) -> None:
+        if worker in self._workers:
+            self._workers.remove(worker)
+        worker.deleteLater()
+
+    def _set_wizard_nav_enabled(self, enabled: bool) -> None:
+        wizard = self.wizard()
+        if wizard is None:
+            return
+        for button in (
+            wizard.WizardButton.BackButton,
+            wizard.WizardButton.NextButton,
+            wizard.WizardButton.FinishButton,
+            wizard.WizardButton.CancelButton,
+        ):
+            if btn := wizard.button(button):
+                btn.setEnabled(enabled)

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 from PySide6.QtCore import Qt, QThread, Signal
@@ -19,11 +18,20 @@ from PySide6.QtWidgets import (
 
 from sublingo import __version__
 from sublingo.core.config import ConfigManager
-from sublingo.core.cookie import import_cookie_file, validate_cookie_file
+from sublingo.core.cookie import (
+    save_cookie_text,
+    validate_cookie_file,
+)
+from sublingo.core.network_policy import resolve_download_proxy
 from sublingo.core.network_policy import resolve_http_proxy_from_values
 from sublingo.gui.config_options import AI_PROVIDER_PRESETS
 from sublingo.gui.widgets.ai_settings_widget import AISettingsWidget
 from sublingo.gui.widgets.ai_settings_widget import TestConnectionWorker
+from sublingo.gui.widgets.cookie_validation_worker import CookieValidationWorker
+from sublingo.gui.widgets.dialogs import create_busy_dialog
+from sublingo.gui.widgets.dialogs import show_info_dialog
+from sublingo.gui.widgets.dialogs import show_question_dialog
+from sublingo.gui.widgets.dialogs import show_warning_dialog
 from sublingo.gui.widgets.file_picker import FilePicker
 from sublingo.gui.widgets.form_row import FormRow
 from sublingo.gui.widgets.settings_group_widgets import CookieSettingsWidget
@@ -43,6 +51,7 @@ class SettingsPage(QWidget):
         super().__init__(parent)
         self._config_mgr = config_mgr
         self._workers: list[QThread] = []
+        self._busy_dialog = None
         self._reset_buttons: dict[str, QPushButton] = {}
         self._loading = False
 
@@ -78,9 +87,6 @@ class SettingsPage(QWidget):
         self._maintenance_section = MaintenanceSettingsWidget(self._field_row, self)
 
         self._cookie_section.cookie_import_btn.clicked.connect(self._on_import_cookie)
-        self._cookie_section.cookie_validate_btn.clicked.connect(
-            self._on_validate_cookie
-        )
         self._ai_section.ai_provider.currentIndexChanged.connect(
             self._on_provider_changed
         )
@@ -172,6 +178,7 @@ class SettingsPage(QWidget):
                 "generate_transcript",
                 None,
             ),
+            "subtitle_mode": getattr(translation_section, "subtitle_mode", None),
             "ai_provider": getattr(ai_section, "ai_provider", None),
             "ai_base_url": getattr(ai_section, "ai_base_url", None),
             "ai_api_key": getattr(ai_section, "ai_api_key", None),
@@ -238,6 +245,7 @@ class SettingsPage(QWidget):
             "target_language": cfg.target_language,
             "font_file": cfg.font_file,
             "generate_transcript": cfg.generate_transcript,
+            "subtitle_mode": cfg.subtitle_mode,
             "ai_provider": cfg.ai_provider,
             "ai_base_url": cfg.ai_base_url,
             "ai_api_key": cfg.ai_api_key,
@@ -276,7 +284,7 @@ class SettingsPage(QWidget):
         setattr(cfg, config_key, value)
         self._config_mgr.save(cfg)
         if config_key == "language" and value != old_value:
-            QMessageBox.information(
+            show_info_dialog(
                 self,
                 self.tr("Info"),
                 self.tr("Interface language saved. Restart the app to apply changes."),
@@ -314,6 +322,10 @@ class SettingsPage(QWidget):
     def _on_test_connection(self) -> None:
         self._ai_section.test_conn_btn.setEnabled(False)
         self._ai_section.test_conn_btn.setText(self.tr("Testing..."))
+        self._show_busy(
+            self.tr("Testing AI Connection"),
+            self.tr("Testing AI connection, please wait..."),
+        )
         policy = resolve_http_proxy_from_values(
             str(self._read_widget_value("proxy_mode") or ""),
             str(self._read_widget_value("proxy") or ""),
@@ -324,38 +336,73 @@ class SettingsPage(QWidget):
             model=self._ai_section.ai_model.text(),
             proxy=policy.proxy,
             trust_env=policy.trust_env,
-            parent=self,
+            parent=None,
         )
         worker.finished.connect(self._on_test_connection_result)
-        self._workers.append(worker)
+        self._register_worker(worker)
         worker.start()
 
     def _on_test_connection_result(self, success: bool, message: str) -> None:
         self._ai_section.test_conn_btn.setEnabled(True)
         self._ai_section.test_conn_btn.setText(self.tr("Test Connection"))
+        self._hide_busy()
         if success:
-            QMessageBox.information(self, self.tr("Connection Successful"), message)
+            show_info_dialog(self, self.tr("Connection Successful"), message)
         else:
-            QMessageBox.warning(self, self.tr("Connection Failed"), message)
+            show_warning_dialog(self, self.tr("Connection Failed"), message)
 
     def _on_import_cookie(self) -> None:
-        source = self._cookie_section.cookie_import_picker.path().strip()
-        if not source:
-            return
-        import_cookie_file(Path(source), self._config_mgr.cookie_file)
-        self._update_cookie_status()
-        QMessageBox.information(
-            self,
-            self.tr("Import Successful"),
-            self.tr("Cookie file updated"),
-        )
+        cookie_file = self._config_mgr.cookie_file
+        cookie_file.parent.mkdir(parents=True, exist_ok=True)
+        if not cookie_file.exists():
+            cookie_file.touch()
 
-    def _on_validate_cookie(self) -> None:
-        ok, message = validate_cookie_file(self._config_mgr.cookie_file)
-        if ok:
-            QMessageBox.information(self, self.tr("Validation Passed"), message)
+        content = self._cookie_section.cookie_input.toPlainText()
+        ok, message = save_cookie_text(content, cookie_file)
+        if not ok:
+            show_warning_dialog(
+                self,
+                self.tr("Import Failed"),
+                self.tr("{message}\n\nExpected format:\n{format_hint}").format(
+                    message=self._localize_cookie_message(message),
+                    format_hint=self.tr(
+                        "Use tab separators (\\t): domain, include_subdomains, path, secure, expires, name, value"
+                    ),
+                ),
+            )
+            self._update_cookie_status()
+            return
+        self._update_cookie_status()
+        self._cookie_section.cookie_import_btn.setEnabled(False)
+        self._cookie_section.cookie_import_btn.setText(self.tr("Validating..."))
+        self._show_busy(
+            self.tr("Validating Cookie"),
+            self.tr("Validating cookie with yt-dlp, please wait..."),
+        )
+        worker = CookieValidationWorker(
+            cookie_file=cookie_file,
+            proxy=resolve_download_proxy(self._config_mgr.config),
+            parent=None,
+        )
+        worker.result_ready.connect(self._on_cookie_validation_result)
+        self._register_worker(worker)
+        worker.start()
+
+    def _on_cookie_validation_result(self, success: bool, message: str) -> None:
+        self._cookie_section.cookie_import_btn.setEnabled(True)
+        self._cookie_section.cookie_import_btn.setText(self.tr("Import & Validate"))
+        self._hide_busy()
+        localized_message = self._localize_cookie_message(message)
+        if success:
+            show_info_dialog(
+                self,
+                self.tr("Import Successful"),
+                self.tr(
+                    "{message}\n\nCookie text saved to internal cookies.txt"
+                ).format(message=localized_message),
+            )
         else:
-            QMessageBox.warning(self, self.tr("Validation Failed"), message)
+            show_warning_dialog(self, self.tr("Validation Failed"), localized_message)
         self._update_cookie_status()
 
     def _update_cookie_status(self) -> None:
@@ -367,32 +414,72 @@ class SettingsPage(QWidget):
             self._cookie_section.cookie_status.setStyleSheet("color: #E5C07B;")
             return
         ok, message = validate_cookie_file(cookie)
+        localized_message = self._localize_cookie_message(message)
         if ok:
             self._cookie_section.cookie_status.setText(
                 self.tr("Cookie status: {} ({} bytes)").format(
-                    message, cookie.stat().st_size
+                    localized_message, cookie.stat().st_size
                 )
             )
             self._cookie_section.cookie_status.setStyleSheet("color: #98C379;")
         else:
             self._cookie_section.cookie_status.setText(
-                self.tr("Cookie status: {}").format(message)
+                self.tr("Cookie status: {}").format(localized_message)
             )
             self._cookie_section.cookie_status.setStyleSheet("color: #E06C75;")
 
+    def _localize_cookie_message(self, message: str) -> str:
+        message_map = {
+            "Cookie file not found": self.tr("Cookie file not found"),
+            "Cookie file is empty": self.tr("Cookie file is empty"),
+            "Valid Netscape cookie format": self.tr("Valid Netscape cookie format"),
+            "Invalid cookie format (expected Netscape)": self.tr(
+                "Invalid cookie format (expected Netscape)"
+            ),
+            "Cookie content is empty": self.tr("Cookie content is empty"),
+            "Cookie saved": self.tr("Cookie saved"),
+            "Cookie validated with yt-dlp": self.tr("Cookie validated with yt-dlp"),
+        }
+        if message.startswith("yt-dlp validation failed: "):
+            detail = message.split("yt-dlp validation failed: ", 1)[1]
+            return self.tr("yt-dlp validation failed: {detail}").format(detail=detail)
+        return message_map.get(message, message)
+
+    def _show_busy(self, title: str, label: str) -> None:
+        self._hide_busy()
+        dialog = create_busy_dialog(self, title, label)
+        dialog.show()
+        self._busy_dialog = dialog
+
+    def _hide_busy(self) -> None:
+        if self._busy_dialog is None:
+            return
+        self._busy_dialog.close()
+        self._busy_dialog.deleteLater()
+        self._busy_dialog = None
+
+    def _register_worker(self, worker: QThread) -> None:
+        self._workers.append(worker)
+        worker.finished.connect(lambda: self._finalize_worker(worker))
+
+    def _finalize_worker(self, worker: QThread) -> None:
+        if worker in self._workers:
+            self._workers.remove(worker)
+        worker.deleteLater()
+
     def _on_reset_all(self) -> None:
-        reply = QMessageBox.question(
+        reply = show_question_dialog(
             self,
             self.tr("Confirm Reset"),
             self.tr(
                 "Reset all settings? This will delete config.json and requires restarting the app."
             ),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
+            buttons=QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            default_button=QMessageBox.StandardButton.No,
         )
         if reply == QMessageBox.StandardButton.Yes:
             self._config_mgr.reset()
-            QMessageBox.information(
+            show_info_dialog(
                 self,
                 self.tr("Reset Complete"),
                 self.tr(

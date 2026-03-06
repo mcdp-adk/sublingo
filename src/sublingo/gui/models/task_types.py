@@ -10,8 +10,7 @@ def _register_i18n_keys() -> None:
     QCoreApplication.translate("TaskType", "Full Workflow")
     QCoreApplication.translate("TaskType", "Download")
     QCoreApplication.translate("TaskType", "Translate")
-    QCoreApplication.translate("TaskType", "Softsub")
-    QCoreApplication.translate("TaskType", "Hardsub")
+    QCoreApplication.translate("TaskType", "Subtitle")
     QCoreApplication.translate("TaskType", "Transcript")
     QCoreApplication.translate("TaskType", "Font Subset")
     QCoreApplication.translate("TaskType", "Workflow")
@@ -32,8 +31,7 @@ class TaskType(Enum):
     WORKFLOW = "workflow"
     DOWNLOAD = "download"
     TRANSLATE = "translate"
-    SOFTSUB = "softsub"
-    HARDSUB = "hardsub"
+    SUBTITLE = "subtitle"
     TRANSCRIPT = "transcript"
     FONT_SUBSET = "font_subset"
 
@@ -49,8 +47,7 @@ TASK_TYPE_DISPLAY: dict[TaskType, str] = {
     TaskType.WORKFLOW: "Full Workflow",
     TaskType.DOWNLOAD: "Download",
     TaskType.TRANSLATE: "Translate",
-    TaskType.SOFTSUB: "Softsub",
-    TaskType.HARDSUB: "Hardsub",
+    TaskType.SUBTITLE: "Subtitle",
     TaskType.TRANSCRIPT: "Transcript",
     TaskType.FONT_SUBSET: "Font Subset",
 }
@@ -67,21 +64,19 @@ TASK_STAGES: dict[TaskType, list[str]] = {
         "Download",
         "Translate",
         "Font Subset",
-        "Softsub",
+        "Subtitle",
         "Transcript",
     ],
     TaskType.DOWNLOAD: ["Download"],
     TaskType.TRANSLATE: ["Segment", "Translate", "Proofread"],
-    TaskType.SOFTSUB: ["Softsub"],
-    TaskType.HARDSUB: ["Hardsub"],
+    TaskType.SUBTITLE: ["Subtitle"],
     TaskType.TRANSCRIPT: ["Transcript"],
     TaskType.FONT_SUBSET: ["Font Subset"],
 }
 
 DEFAULT_STAGE_BY_TASK: dict[TaskType, str] = {
     TaskType.DOWNLOAD: "download",
-    TaskType.SOFTSUB: "softsub",
-    TaskType.HARDSUB: "hardsub",
+    TaskType.SUBTITLE: "subtitle",
     TaskType.TRANSCRIPT: "transcript",
     TaskType.FONT_SUBSET: "font_subset",
 }
@@ -98,10 +93,10 @@ BACKEND_STAGE_TO_DISPLAY: dict[str, str] = {
     "proofreading": "Proofread",
     "font": "Font Subset",
     "font_subset": "Font Subset",
-    "softsub": "Softsub",
-    "mux": "Softsub",
-    "hardsub": "Hardsub",
-    "burn": "Hardsub",
+    "softsub": "Subtitle",
+    "mux": "Subtitle",
+    "hardsub": "Subtitle",
+    "burn": "Subtitle",
     "transcript": "Transcript",
     "complete": "Complete",
 }

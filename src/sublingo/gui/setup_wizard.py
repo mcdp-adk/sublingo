@@ -72,6 +72,7 @@ class SetupWizard(QWizard):
         cfg.ai_model = self.ai_page.ai_model.text()
         cfg.proxy_mode = str(self.ai_page.proxy_mode.currentData() or cfg.proxy_mode)
         cfg.proxy = self.ai_page.proxy_input.text()
+        cfg.project_dir = self.other_page.project_dir.path() or cfg.project_dir
         cfg.output_dir = self.other_page.output_dir.path() or cfg.output_dir
         self._config_mgr.save(cfg)
         super().accept()

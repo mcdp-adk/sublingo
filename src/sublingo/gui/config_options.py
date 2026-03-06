@@ -8,6 +8,8 @@ from sublingo.core.config import AI_PROVIDER_PRESETS
 from sublingo.core.config import PROXY_MODE_CUSTOM
 from sublingo.core.config import PROXY_MODE_DISABLED
 from sublingo.core.config import PROXY_MODE_SYSTEM
+from sublingo.core.config import SUBTITLE_MODE_HARD
+from sublingo.core.config import SUBTITLE_MODE_SOFT
 
 
 PROVIDER_DISPLAY_NAMES: dict[str, str] = {
@@ -26,10 +28,8 @@ def format_language_option_label(
     name: str,
     translator: Callable[[str], str] | None = None,
 ) -> str:
-    if translator is not None and code == "auto":
-        name = translator(name)
     if code == "auto":
-        return name
+        return QCoreApplication.translate("LanguageOption", "System Language")
     return f"{name} ({code})"
 
 
@@ -59,6 +59,11 @@ PROXY_MODE_OPTIONS: dict[str, str] = {
     PROXY_MODE_DISABLED: "No Proxy",
 }
 
+SUBTITLE_MODE_OPTIONS: dict[str, str] = {
+    SUBTITLE_MODE_SOFT: "Soft Subtitle",
+    SUBTITLE_MODE_HARD: "Hard Subtitle",
+}
+
 
 def _register_proxy_i18n_keys() -> None:
     QCoreApplication.translate("ProxyMode", "Use System Proxy")
@@ -66,9 +71,25 @@ def _register_proxy_i18n_keys() -> None:
     QCoreApplication.translate("ProxyMode", "No Proxy")
 
 
+def _register_subtitle_mode_i18n_keys() -> None:
+    QCoreApplication.translate("SubtitleMode", "Soft Subtitle")
+    QCoreApplication.translate("SubtitleMode", "Hard Subtitle")
+
+
+def _register_language_i18n_keys() -> None:
+    QCoreApplication.translate("LanguageOption", "System Language")
+
+
 def format_proxy_mode_label(mode: str) -> str:
     label = PROXY_MODE_OPTIONS.get(mode, "Use System Proxy")
     return QCoreApplication.translate("ProxyMode", label)
 
 
+def format_subtitle_mode_label(mode: str) -> str:
+    label = SUBTITLE_MODE_OPTIONS.get(mode, "Soft Subtitle")
+    return QCoreApplication.translate("SubtitleMode", label)
+
+
 _register_proxy_i18n_keys()
+_register_language_i18n_keys()
+_register_subtitle_mode_i18n_keys()

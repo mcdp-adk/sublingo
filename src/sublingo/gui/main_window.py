@@ -155,6 +155,9 @@ class MainWindow(QMainWindow):
         page_idx = current.data(_PAGE_INDEX_ROLE)
         if page_idx is None:
             return
+        target_widget = self._stack.widget(page_idx)
+        if isinstance(target_widget, HomePage):
+            target_widget.refresh_defaults_from_config()
         self._stack.setCurrentIndex(page_idx)
 
     def _navigate_to_page(self, page_name: str) -> None:

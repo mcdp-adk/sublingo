@@ -1,20 +1,24 @@
-"""Tests for cookie file handling."""
-
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
-from sublingo.core.cookie import import_cookie_file, validate_cookie_file
+from sublingo.core.cookie import (
+    save_cookie_text,
+    validate_cookie_file,
+    validate_cookie_with_ytdlp,
+)
 
 
 class TestValidateCookieFile:
     """Tests for validate_cookie_file function."""
 
     @pytest.fixture
-    def temp_dir(self) -> Path:
+    def temp_dir(self) -> Iterator[Path]:
         """Provide a temporary directory."""
         with tempfile.TemporaryDirectory() as tmp:
             yield Path(tmp)
@@ -66,27 +70,6 @@ class TestValidateCookieFile:
         assert success is True
         assert "netscape" in message.lower()
 
-    def test_valid_json_format(self, temp_dir: Path) -> None:
-        """Test validation passes for valid JSON format."""
-        cookie_file = temp_dir / "cookies.txt"
-        content = """[
-            {"name": "cookie1", "value": "value1", "domain": ".example.com"},
-            {"name": "cookie2", "value": "value2", "domain": ".youtube.com"}
-        ]"""
-        cookie_file.write_text(content)
-        success, message = validate_cookie_file(cookie_file)
-        assert success is True
-        assert "json" in message.lower()
-
-    def test_valid_json_single_object(self, temp_dir: Path) -> None:
-        """Test validation passes for JSON array with single object."""
-        cookie_file = temp_dir / "cookies.txt"
-        content = '[{"name": "cookie1", "value": "value1"}]'
-        cookie_file.write_text(content)
-        success, message = validate_cookie_file(cookie_file)
-        assert success is True
-        assert "json" in message.lower()
-
     def test_invalid_netscape_too_few_fields(self, temp_dir: Path) -> None:
         """Test validation fails for Netscape format with too few fields."""
         cookie_file = temp_dir / "cookies.txt"
@@ -95,7 +78,7 @@ class TestValidateCookieFile:
         cookie_file.write_text(content)
         success, message = validate_cookie_file(cookie_file)
         assert success is False
-        assert "unrecognized" in message.lower()
+        assert "expected netscape" in message.lower()
 
     def test_invalid_format(self, temp_dir: Path) -> None:
         """Test validation fails for completely invalid format."""
@@ -104,34 +87,14 @@ class TestValidateCookieFile:
         cookie_file.write_text(content)
         success, message = validate_cookie_file(cookie_file)
         assert success is False
-        assert "unrecognized" in message.lower()
+        assert "expected netscape" in message.lower()
 
-    def test_invalid_json_not_array(self, temp_dir: Path) -> None:
-        """Test validation fails for JSON that is not an array."""
+    def test_json_cookie_content_is_rejected(self, temp_dir: Path) -> None:
         cookie_file = temp_dir / "cookies.txt"
-        content = '{"name": "cookie1", "value": "value1"}'
-        cookie_file.write_text(content)
+        cookie_file.write_text('[{"name":"sid","value":"v"}]')
         success, message = validate_cookie_file(cookie_file)
         assert success is False
-        assert "unrecognized" in message.lower()
-
-    def test_invalid_json_empty_array(self, temp_dir: Path) -> None:
-        """Test validation fails for empty JSON array."""
-        cookie_file = temp_dir / "cookies.txt"
-        content = "[]"
-        cookie_file.write_text(content)
-        success, message = validate_cookie_file(cookie_file)
-        assert success is False
-        assert "unrecognized" in message.lower()
-
-    def test_invalid_json_primitives_array(self, temp_dir: Path) -> None:
-        """Test validation fails for JSON array of primitives."""
-        cookie_file = temp_dir / "cookies.txt"
-        content = '["string1", "string2", 123]'
-        cookie_file.write_text(content)
-        success, message = validate_cookie_file(cookie_file)
-        assert success is False
-        assert "unrecognized" in message.lower()
+        assert "expected netscape" in message.lower()
 
     def test_binary_file_with_replacement(self, temp_dir: Path) -> None:
         """Test validation handles binary files with error replacement."""
@@ -142,77 +105,118 @@ class TestValidateCookieFile:
         assert success is False
 
 
-class TestImportCookieFile:
-    """Tests for import_cookie_file function."""
+class TestSaveCookieText:
+    """Tests for save_cookie_text function."""
 
     @pytest.fixture
-    def temp_dir(self) -> Path:
+    def temp_dir(self) -> Iterator[Path]:
         """Provide a temporary directory."""
         with tempfile.TemporaryDirectory() as tmp:
             yield Path(tmp)
 
-    def test_import_success(self, temp_dir: Path) -> None:
-        """Test successful cookie file import."""
-        source = temp_dir / "source" / "cookies.txt"
-        dest = temp_dir / "dest" / "cookies.txt"
+    def test_save_valid_netscape_cookie_text(self, temp_dir: Path) -> None:
+        dest = temp_dir / "internal" / "cookies.txt"
+        content = (
+            "# Netscape HTTP Cookie File\n"
+            ".youtube.com\tTRUE\t/\tTRUE\t2147483647\tSID\tvalue"
+        )
+        success, message = save_cookie_text(content, dest)
+        assert success is True
+        assert "saved" in message.lower()
+        assert dest.exists() is True
+        assert "SID" in dest.read_text(encoding="utf-8")
 
-        # Create source file
-        source.parent.mkdir(parents=True)
-        source.write_text(
-            "# Netscape cookie file\n.example.com\tTRUE\t/\tFALSE\t1893456000\tcookie\tvalue"
+    def test_save_rejects_empty_cookie_text(self, temp_dir: Path) -> None:
+        success, message = save_cookie_text("   \n\t", temp_dir / "cookies.txt")
+        assert success is False
+        assert "empty" in message.lower()
+
+    def test_save_rejects_non_netscape_cookie_text(self, temp_dir: Path) -> None:
+        success, message = save_cookie_text('{"name":"sid"}', temp_dir / "cookies.txt")
+        assert success is False
+        assert "expected netscape" in message.lower()
+
+
+class TestValidateCookieWithYtdlp:
+    @pytest.fixture
+    def temp_dir(self) -> Iterator[Path]:
+        with tempfile.TemporaryDirectory() as tmp:
+            yield Path(tmp)
+
+    def test_rejects_invalid_format_before_yt_dlp(
+        self,
+        temp_dir: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        cookie_file = temp_dir / "cookies.txt"
+        cookie_file.write_text("invalid", encoding="utf-8")
+
+        class ProbeShouldNotRun:
+            def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+                raise AssertionError("YoutubeDL should not be constructed")
+
+        monkeypatch.setattr("sublingo.core.cookie.yt_dlp.YoutubeDL", ProbeShouldNotRun)
+
+        success, message = validate_cookie_with_ytdlp(cookie_file, proxy=None)
+        assert success is False
+        assert "expected netscape" in message.lower()
+
+    def test_reports_error_when_yt_dlp_fails(
+        self,
+        temp_dir: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        cookie_file = temp_dir / "cookies.txt"
+        cookie_file.write_text(
+            ".youtube.com\tTRUE\t/\tTRUE\t2147483647\tSID\tvalue\n",
+            encoding="utf-8",
         )
 
-        # Import
-        import_cookie_file(source, dest)
+        class ProbeRaises:
+            def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+                pass
 
-        # Verify destination exists and has correct content
-        assert dest.exists()
-        assert dest.read_text() == source.read_text()
+            def __enter__(self) -> "ProbeRaises":
+                return self
 
-    def test_import_creates_parent_dirs(self, temp_dir: Path) -> None:
-        """Test import creates parent directories for destination."""
-        source = temp_dir / "source.txt"
-        dest = temp_dir / "deep" / "nested" / "dest.txt"
+            def __exit__(self, *_args: Any) -> None:
+                return None
 
-        source.write_text("cookie data")
+            def extract_info(self, *_args: Any, **_kwargs: Any) -> dict[str, Any]:
+                raise RuntimeError("forbidden")
 
-        import_cookie_file(source, dest)
+        monkeypatch.setattr("sublingo.core.cookie.yt_dlp.YoutubeDL", ProbeRaises)
 
-        assert dest.exists()
-        assert dest.parent.exists()
+        success, message = validate_cookie_with_ytdlp(cookie_file, proxy=None)
+        assert success is False
+        assert message.startswith("yt-dlp validation failed: ")
 
-    def test_import_overwrites_existing(self, temp_dir: Path) -> None:
-        """Test import overwrites existing destination file."""
-        source = temp_dir / "source.txt"
-        dest = temp_dir / "dest.txt"
+    def test_succeeds_when_yt_dlp_returns_video_info(
+        self,
+        temp_dir: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        cookie_file = temp_dir / "cookies.txt"
+        cookie_file.write_text(
+            ".youtube.com\tTRUE\t/\tTRUE\t2147483647\tSID\tvalue\n",
+            encoding="utf-8",
+        )
 
-        source.write_text("new cookie data")
-        dest.write_text("old cookie data")
+        class ProbeReturnsInfo:
+            def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+                pass
 
-        import_cookie_file(source, dest)
+            def __enter__(self) -> "ProbeReturnsInfo":
+                return self
 
-        assert dest.read_text() == "new cookie data"
+            def __exit__(self, *_args: Any) -> None:
+                return None
 
-    def test_import_preserves_metadata(self, temp_dir: Path) -> None:
-        """Test import preserves file metadata (via shutil.copy2)."""
-        source = temp_dir / "source.txt"
-        dest = temp_dir / "dest.txt"
+            def extract_info(self, *_args: Any, **_kwargs: Any) -> dict[str, Any]:
+                return {"id": "dQw4w9WgXcQ"}
 
-        source.write_text("cookie data")
-        # Note: shutil.copy2 preserves metadata, but on some systems
-        # this test may be limited by filesystem support
+        monkeypatch.setattr("sublingo.core.cookie.yt_dlp.YoutubeDL", ProbeReturnsInfo)
 
-        import_cookie_file(source, dest)
-
-        assert dest.exists()
-        assert dest.read_text() == "cookie data"
-
-    def test_import_source_not_found(self, temp_dir: Path) -> None:
-        """Test import raises FileNotFoundError when source doesn't exist."""
-        source = temp_dir / "nonexistent.txt"
-        dest = temp_dir / "dest.txt"
-
-        with pytest.raises(FileNotFoundError) as exc_info:
-            import_cookie_file(source, dest)
-
-        assert "nonexistent" in str(exc_info.value)
+        success, message = validate_cookie_with_ytdlp(cookie_file, proxy=None)
+        assert success is True
+        assert "validated with yt-dlp" in message.lower()

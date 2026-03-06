@@ -10,8 +10,6 @@ from PySide6.QtWidgets import (
     QLabel,
     QListWidget,
     QListWidgetItem,
-    QMessageBox,
-    QProgressDialog,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -28,6 +26,8 @@ from sublingo.gui.models.task_types import TaskType
 from sublingo.gui.widgets.batch_preview_dialog import PreviewDialog
 from sublingo.gui.widgets.batch_preview_dialog import PreviewFetchWorker
 from sublingo.gui.widgets.batch_preview_dialog import extract_playlist_info
+from sublingo.gui.widgets.dialogs import create_progress_dialog
+from sublingo.gui.widgets.dialogs import show_warning_dialog
 from sublingo.gui.widgets.home_task_forms import HomeTaskForms
 
 
@@ -44,7 +44,7 @@ class HomePage(QWidget):
         self._config_mgr = config_mgr
         self._task_mgr = task_mgr
         self._preview_worker: PreviewFetchWorker | None = None
-        self._preview_progress: QProgressDialog | None = None
+        self._preview_progress = None
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
@@ -60,6 +60,9 @@ class HomePage(QWidget):
     def set_task_manager(self, task_mgr: TaskManager) -> None:
         self._task_mgr = task_mgr
         self._connect_task_mgr(task_mgr)
+
+    def refresh_defaults_from_config(self) -> None:
+        self._forms.sync_task_defaults_from_config()
 
     def _build_create_group(self) -> QGroupBox:
         group = QGroupBox(self.tr("New Task"))
@@ -136,16 +139,17 @@ class HomePage(QWidget):
         ok, _message = validate_cookie_file(self._config_mgr.cookie_file)
         if ok:
             return True
-        QMessageBox.warning(self, self.tr("Error"), self.tr("Cookie file is invalid"))
+        show_warning_dialog(self, self.tr("Error"), self.tr("Cookie file is invalid"))
         return False
 
     def _on_preview(self) -> None:
         if self._task_mgr is None:
             return
+        self._forms.sync_task_defaults_from_config()
         task_type = self._current_task_type()
         urls = self._forms.get_urls(task_type)
         if not urls:
-            QMessageBox.warning(
+            show_warning_dialog(
                 self, self.tr("Error"), self.tr("Please enter at least one URL")
             )
             return
@@ -155,14 +159,14 @@ class HomePage(QWidget):
 
     def _start_preview_fetch(self, task_type: TaskType, urls: list[str]) -> None:
         self._preview_btn.setEnabled(False)
-        progress = QProgressDialog(
+        progress = create_progress_dialog(
+            self,
+            self.tr("Fetching video info"),
             self.tr("Fetching video info..."),
             self.tr("Cancel"),
             0,
             len(urls),
-            self,
         )
-        progress.setWindowModality(Qt.WindowModality.WindowModal)
         progress.setValue(0)
         progress.show()
         self._preview_progress = progress
@@ -198,14 +202,14 @@ class HomePage(QWidget):
 
     def _on_preview_fetch_finished(self, task_type: TaskType, rows: list[Any]) -> None:
         if not rows:
-            QMessageBox.warning(self, self.tr("Error"), self.tr("No videos found"))
+            show_warning_dialog(self, self.tr("Error"), self.tr("No videos found"))
             return
         dialog = PreviewDialog(rows, self)
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
         selected_urls = dialog.selected_urls()
         if not selected_urls:
-            QMessageBox.warning(
+            show_warning_dialog(
                 self, self.tr("Error"), self.tr("Please select at least one video")
             )
             return
@@ -213,7 +217,7 @@ class HomePage(QWidget):
         self.navigate_requested.emit("tasks")
 
     def _on_preview_fetch_error(self, error_message: str) -> None:
-        QMessageBox.warning(
+        show_warning_dialog(
             self,
             self.tr("Error"),
             self.tr("Failed to fetch video info: {error}").format(error=error_message),
@@ -232,13 +236,14 @@ class HomePage(QWidget):
     def _on_start(self) -> None:
         if self._task_mgr is None:
             return
+        self._forms.sync_task_defaults_from_config()
         task_type = self._current_task_type()
         if not self._validate_cookie_if_needed(task_type):
             return
         if task_type in (TaskType.WORKFLOW, TaskType.DOWNLOAD):
             urls = self._forms.get_urls(task_type)
             if not urls:
-                QMessageBox.warning(
+                show_warning_dialog(
                     self, self.tr("Error"), self.tr("Please enter at least one URL")
                 )
                 return
@@ -246,7 +251,7 @@ class HomePage(QWidget):
         else:
             params = self._forms.collect_params(task_type)
             if params is None:
-                QMessageBox.warning(
+                show_warning_dialog(
                     self,
                     self.tr("Error"),
                     self.tr("Please fill in all required fields"),

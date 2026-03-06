@@ -8,6 +8,7 @@ import pytest
 from PySide6.QtCore import QCoreApplication, QObject, Signal
 
 from sublingo.core.config import ConfigManager
+from sublingo.core.config import SUBTITLE_MODE_SOFT
 from sublingo.core.models import DownloadResult
 from sublingo.gui.models.task import TaskManager
 from sublingo.gui.models.task_info import format_task_title
@@ -230,21 +231,22 @@ def test_task_manager_loads_persisted_tasks_on_startup(tmp_path: Path) -> None:
     )
     finished = TaskInfo(
         id="done456",
-        task_type=TaskType.SOFTSUB,
+        task_type=TaskType.SUBTITLE,
         params={
             "video_file": tmp_path / "video.mkv",
             "subtitle_file": tmp_path / "demo.ass",
+            "subtitle_mode": SUBTITLE_MODE_SOFT,
         },
         status=TaskStatus.COMPLETED,
         created_at=created_at,
-        current_stage="Softsub",
+        current_stage="Subtitle",
         progress_percent=100,
         progress_message="done",
         meta={"output_path": tmp_path / "video.softsub.mkv"},
         result={"output_path": tmp_path / "video.softsub.mkv"},
         video_title="Demo",
     )
-    finished.stage_statuses["Softsub"] = "done"
+    finished.stage_statuses["Subtitle"] = "done"
 
     save_tasks({queued.id: queued, finished.id: finished}, persistence_path)
 
@@ -254,7 +256,7 @@ def test_task_manager_loads_persisted_tasks_on_startup(tmp_path: Path) -> None:
     assert manager.task_order == [queued.id, finished.id]
     assert manager.get_task(queued.id) is not None
     assert finished_task is not None
-    assert finished_task.task_type == TaskType.SOFTSUB
+    assert finished_task.task_type == TaskType.SUBTITLE
     assert finished_task.created_at == created_at
     assert finished_task.params["video_file"] == str(tmp_path / "video.mkv")
     assert finished_task.meta["output_path"] == str(tmp_path / "video.softsub.mkv")
@@ -271,6 +273,18 @@ def test_task_manager_resolves_output_dir_from_config_when_param_missing(
     resolved = manager._resolve_output_dir({})
 
     assert resolved == (tmp_path / "output").resolve()
+
+
+def test_task_manager_resolves_windows_absolute_output_dir_without_rebasing(
+    tmp_path: Path,
+) -> None:
+    manager = TaskManager(
+        ConfigManager(tmp_path), persistence_path=tmp_path / "tasks.json"
+    )
+
+    resolved = manager._resolve_output_dir({"output_dir": r"C:\\videos\\out"})
+
+    assert str(resolved) == r"C:\\videos\\out"
 
 
 @pytest.mark.asyncio

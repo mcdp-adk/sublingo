@@ -10,14 +10,18 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QPushButton,
+    QTextEdit,
     QWidget,
 )
 
 from sublingo.core.config import PROXY_MODE_CUSTOM
 from sublingo.core.config import PROXY_MODE_DISABLED
 from sublingo.core.config import PROXY_MODE_SYSTEM
+from sublingo.core.config import SUBTITLE_MODE_HARD
+from sublingo.core.config import SUBTITLE_MODE_SOFT
 from sublingo.gui.config_options import format_language_option_label
 from sublingo.gui.config_options import format_proxy_mode_label
+from sublingo.gui.config_options import format_subtitle_mode_label
 from sublingo.gui.config_options import GUI_LANGUAGES
 from sublingo.gui.config_options import TARGET_LANGUAGES
 from sublingo.gui.widgets.file_picker import FilePicker
@@ -71,9 +75,20 @@ class TranslationSettingsWidget(SettingsSection):
         self.add_row(row_builder(self.tr("Font File:"), self.font_file, "font_file"))
 
         self.generate_transcript = QCheckBox(
-            self.tr("Generate transcript for workflows")
+            self.tr("Generate transcript in workflows")
         )
         self.add_row(row_builder("", self.generate_transcript, "generate_transcript"))
+
+        self.subtitle_mode = QComboBox()
+        for mode in (SUBTITLE_MODE_SOFT, SUBTITLE_MODE_HARD):
+            self.subtitle_mode.addItem(format_subtitle_mode_label(mode), mode)
+        self.add_row(
+            row_builder(
+                self.tr("Subtitle Mode:"),
+                self.subtitle_mode,
+                "subtitle_mode",
+            )
+        )
 
 
 class CookieSettingsWidget(SettingsSection):
@@ -82,16 +97,14 @@ class CookieSettingsWidget(SettingsSection):
         self.cookie_status = QLabel()
         self.section_layout.addWidget(self.cookie_status)
 
+        self.cookie_input = QTextEdit()
+        self.cookie_input.setPlaceholderText(self.tr("Paste Netscape cookie text here"))
+        self.cookie_input.setMinimumHeight(76)
+        self.section_layout.addWidget(self.cookie_input)
+
         button_row = QHBoxLayout()
-        self.cookie_import_picker = FilePicker(
-            mode="file",
-            filter=self.tr("Text Files (*.txt)"),
-        )
-        button_row.addWidget(self.cookie_import_picker, stretch=1)
-        self.cookie_import_btn = QPushButton(self.tr("Import"))
+        self.cookie_import_btn = QPushButton(self.tr("Import & Validate"))
         button_row.addWidget(self.cookie_import_btn)
-        self.cookie_validate_btn = QPushButton(self.tr("Validate"))
-        button_row.addWidget(self.cookie_validate_btn)
         self.section_layout.addLayout(button_row)
 
 

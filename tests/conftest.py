@@ -60,6 +60,7 @@ def mock_core_modules(monkeypatch: pytest.MonkeyPatch) -> dict[str, MagicMock]:
     from sublingo.gui import setup_wizard
     from sublingo.gui.models import task as task_model
     from sublingo.gui.pages import home, settings
+    from sublingo.gui.wizards import other_settings_page
 
     mocks = {
         "home_validate_cookie_file": MagicMock(return_value=(True, COOKIE_OK_MESSAGE)),
@@ -70,7 +71,7 @@ def mock_core_modules(monkeypatch: pytest.MonkeyPatch) -> dict[str, MagicMock]:
             return_value=(True, COOKIE_OK_MESSAGE)
         ),
         "extract_playlist_info": MagicMock(return_value=[PREVIEW_VIDEO]),
-        "import_cookie_file": MagicMock(),
+        "save_cookie_text": MagicMock(return_value=(True, "Cookie saved")),
         "download": MagicMock(
             return_value=SimpleNamespace(success=True, video_title="Demo Video")
         ),
@@ -96,7 +97,12 @@ def mock_core_modules(monkeypatch: pytest.MonkeyPatch) -> dict[str, MagicMock]:
     monkeypatch.setattr(
         settings, "validate_cookie_file", mocks["settings_validate_cookie_file"]
     )
-    monkeypatch.setattr(settings, "import_cookie_file", mocks["import_cookie_file"])
+    monkeypatch.setattr(settings, "save_cookie_text", mocks["save_cookie_text"])
+    monkeypatch.setattr(
+        other_settings_page,
+        "validate_cookie_file",
+        mocks["wizard_validate_cookie_file"],
+    )
     monkeypatch.setattr(
         setup_wizard,
         "validate_cookie_file",

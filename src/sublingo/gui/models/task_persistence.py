@@ -10,6 +10,8 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+from sublingo.core.config import SUBTITLE_MODE_HARD
+from sublingo.core.config import SUBTITLE_MODE_SOFT
 from sublingo.gui.models.task_info import TaskInfo
 from sublingo.gui.models.task_types import STAGE_ERROR
 from sublingo.gui.models.task_types import TaskStatus
@@ -17,6 +19,8 @@ from sublingo.gui.models.task_types import TaskType
 
 TASKS_PAYLOAD_KEY: str = "tasks"
 INTERRUPTED_TASK_ERROR: str = "Task was still running when app closed"
+LEGACY_TASK_TYPE_SOFTSUB: str = "softsub"
+LEGACY_TASK_TYPE_HARDSUB: str = "hardsub"
 
 
 def save_tasks(tasks: dict[str, TaskInfo], path: Path) -> None:
@@ -93,10 +97,21 @@ def _serialize_value(value: Any) -> Any:
 
 
 def _deserialize_task(payload: dict[str, Any]) -> TaskInfo:
+    raw_task_type = str(payload.get("task_type", TaskType.WORKFLOW.value))
+    params = dict(payload.get("params") or {})
+    if raw_task_type == LEGACY_TASK_TYPE_SOFTSUB:
+        task_type = TaskType.SUBTITLE
+        params.setdefault("subtitle_mode", SUBTITLE_MODE_SOFT)
+    elif raw_task_type == LEGACY_TASK_TYPE_HARDSUB:
+        task_type = TaskType.SUBTITLE
+        params.setdefault("subtitle_mode", SUBTITLE_MODE_HARD)
+    else:
+        task_type = TaskType(raw_task_type)
+
     task = TaskInfo(
         id=str(payload.get("id") or ""),
-        task_type=TaskType(payload.get("task_type", TaskType.WORKFLOW.value)),
-        params=dict(payload.get("params") or {}),
+        task_type=task_type,
+        params=params,
         status=TaskStatus(payload.get("status", TaskStatus.QUEUED.value)),
         created_at=_parse_datetime(payload.get("created_at")),
         stages=list(payload.get("stages") or []),

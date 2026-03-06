@@ -12,11 +12,15 @@ from sublingo.core.constants import (
     AI_PROOFREADING_BATCH_SIZE,
     AI_TRANSLATION_BATCH_SIZE,
 )
+from sublingo.core.path_policy import resolve_user_path
 
 DEFAULT_PROJECT_DIR: str = "./output"
 DEFAULT_OUTPUT_DIR: str = "./output"
 DEFAULT_TARGET_LANGUAGE: str = "auto"
 DEFAULT_GENERATE_TRANSCRIPT: bool = False
+SUBTITLE_MODE_SOFT: str = "softsub"
+SUBTITLE_MODE_HARD: str = "hardsub"
+DEFAULT_SUBTITLE_MODE: str = SUBTITLE_MODE_SOFT
 DEFAULT_FONT_FILE: str = "LXGWWenKai-Medium.ttf"
 DEFAULT_AI_PROVIDER: str = "openai"
 DEFAULT_AI_BASE_URL: str = "https://api.openai.com/v1"
@@ -58,6 +62,7 @@ class AppConfig:
     # Translation
     target_language: str = DEFAULT_TARGET_LANGUAGE
     generate_transcript: bool = DEFAULT_GENERATE_TRANSCRIPT
+    subtitle_mode: str = DEFAULT_SUBTITLE_MODE
 
     # Font
     font_file: str = DEFAULT_FONT_FILE
@@ -94,6 +99,13 @@ def normalize_proxy_mode(value: str | None) -> str:
     if mode in {PROXY_MODE_SYSTEM, PROXY_MODE_CUSTOM, PROXY_MODE_DISABLED}:
         return mode
     return DEFAULT_PROXY_MODE
+
+
+def normalize_subtitle_mode(value: str | None) -> str:
+    mode = (value or "").strip().lower()
+    if mode in {SUBTITLE_MODE_SOFT, SUBTITLE_MODE_HARD}:
+        return mode
+    return DEFAULT_SUBTITLE_MODE
 
 
 class ConfigManager:
@@ -155,6 +167,9 @@ class ConfigManager:
         elif str(data.get("proxy") or "").strip():
             data["proxy_mode"] = PROXY_MODE_CUSTOM
 
+        if "subtitle_mode" in data:
+            data["subtitle_mode"] = normalize_subtitle_mode(str(data["subtitle_mode"]))
+
         # Filter out unknown fields
         known_fields = {f.name for f in fields(AppConfig)}
         filtered = {k: v for k, v in data.items() if k in known_fields}
@@ -185,16 +200,8 @@ class ConfigManager:
 
     def resolve_project_dir(self) -> Path:
         """Resolve project_dir relative to project_root."""
-        raw = self.config.project_dir
-        p = Path(raw)
-        if p.is_absolute():
-            return p.resolve()
-        return (self._project_root / raw).resolve()
+        return resolve_user_path(self.config.project_dir, self._project_root)
 
     def resolve_output_dir(self) -> Path:
         """Resolve output_dir relative to project_root."""
-        raw = self.config.output_dir
-        p = Path(raw)
-        if p.is_absolute():
-            return p.resolve()
-        return (self._project_root / raw).resolve()
+        return resolve_user_path(self.config.output_dir, self._project_root)

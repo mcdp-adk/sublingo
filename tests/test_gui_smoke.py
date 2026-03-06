@@ -9,6 +9,8 @@ from sublingo.gui.models.task_types import TaskType
 from sublingo.gui.pages.home import HomePage
 from sublingo.gui.pages.settings import SettingsPage
 from sublingo.gui.setup_wizard import SetupWizard
+from sublingo.core.config import SUBTITLE_MODE_HARD
+from sublingo.core.config import SUBTITLE_MODE_SOFT
 
 SETTINGS_SECTION_TITLES = {
     "GUI",
@@ -84,6 +86,23 @@ def test_setup_wizard_pages_can_be_traversed(
     qtbot.waitUntil(lambda: wizard.currentPage().title() == WIZARD_TITLES[1])
 
 
+def test_setup_wizard_saves_project_and_final_output_dirs(
+    qtbot,
+    gui_config_mgr,
+    mock_core_modules,
+) -> None:
+    wizard = SetupWizard(gui_config_mgr)
+    qtbot.addWidget(wizard)
+
+    wizard.other_page.project_dir.set_path("./project_workspace")
+    wizard.other_page.output_dir.set_path("./final_output")
+    wizard.accept()
+
+    cfg = gui_config_mgr.load()
+    assert cfg.project_dir == "./project_workspace"
+    assert cfg.output_dir == "./final_output"
+
+
 def test_settings_page_loads_all_sections(
     qtbot,
     gui_config_mgr,
@@ -119,3 +138,60 @@ def test_home_page_task_type_selector_switches_forms(
     page._task_type.setCurrentIndex(download_index)
     qtbot.waitUntil(lambda: page._form_stack.currentWidget() is page._download_form)
     assert page._preview_btn.isVisible() is True
+
+
+def test_home_page_toggles_do_not_overwrite_global_settings(
+    qtbot,
+    gui_config_mgr,
+    mock_core_modules,
+) -> None:
+    page = HomePage(gui_config_mgr)
+    qtbot.addWidget(page)
+    page.show()
+
+    page._forms.workflow_transcript.setChecked(True)
+    subtitle_index = page._forms.subtitle_mode.findData(SUBTITLE_MODE_HARD)
+    page._forms.subtitle_mode.setCurrentIndex(subtitle_index)
+
+    cfg = gui_config_mgr.load()
+    assert cfg.generate_transcript is False
+    assert cfg.subtitle_mode == SUBTITLE_MODE_SOFT
+
+
+def test_main_window_switching_back_to_home_refreshes_form_defaults(
+    qtbot,
+    main_window: MainWindow,
+) -> None:
+    cfg = main_window._config_mgr.load()
+    cfg.generate_transcript = True
+    cfg.subtitle_mode = SUBTITLE_MODE_HARD
+    main_window._config_mgr.save(cfg)
+
+    main_window._sidebar.setCurrentRow(2)
+    qtbot.waitUntil(
+        lambda: main_window._stack.currentWidget() is main_window.page("settings")
+    )
+    main_window._sidebar.setCurrentRow(0)
+    qtbot.waitUntil(
+        lambda: main_window._stack.currentWidget() is main_window.page("home")
+    )
+
+    home = main_window.page("home")
+    assert isinstance(home, HomePage)
+    assert home._forms.workflow_transcript.isChecked() is True
+    assert home._forms.subtitle_mode.currentData() == SUBTITLE_MODE_HARD
+
+    cfg = main_window._config_mgr.load()
+    cfg.generate_transcript = False
+    cfg.subtitle_mode = SUBTITLE_MODE_SOFT
+    main_window._config_mgr.save(cfg)
+    main_window._sidebar.setCurrentRow(2)
+    qtbot.waitUntil(
+        lambda: main_window._stack.currentWidget() is main_window.page("settings")
+    )
+    main_window._sidebar.setCurrentRow(0)
+    qtbot.waitUntil(
+        lambda: main_window._stack.currentWidget() is main_window.page("home")
+    )
+    assert home._forms.workflow_transcript.isChecked() is False
+    assert home._forms.subtitle_mode.currentData() == SUBTITLE_MODE_SOFT

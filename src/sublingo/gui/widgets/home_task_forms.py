@@ -5,7 +5,10 @@ from pathlib import Path
 from PySide6.QtWidgets import QCheckBox, QComboBox, QSizePolicy, QVBoxLayout, QWidget
 
 from sublingo.core.config import ConfigManager
+from sublingo.core.config import SUBTITLE_MODE_HARD
+from sublingo.core.config import SUBTITLE_MODE_SOFT
 from sublingo.gui.config_options import format_language_option_label
+from sublingo.gui.config_options import format_subtitle_mode_label
 from sublingo.gui.config_options import TARGET_LANGUAGES
 from sublingo.gui.models.task_types import TaskType
 from sublingo.gui.widgets.file_picker import FilePicker
@@ -34,8 +37,7 @@ class HomeTaskForms(QWidget):
         self.workflow_form = self._build_workflow_form()
         self.download_form = self._build_download_form()
         self.translate_form = self._build_translate_form()
-        self.softsub_form = self._build_softsub_form()
-        self.hardsub_form = self._build_hardsub_form()
+        self.subtitle_form = self._build_subtitle_form()
         self.transcript_form = self._build_transcript_form()
         self.font_subset_form = self._build_font_subset_form()
 
@@ -43,8 +45,7 @@ class HomeTaskForms(QWidget):
             self.workflow_form,
             self.download_form,
             self.translate_form,
-            self.softsub_form,
-            self.hardsub_form,
+            self.subtitle_form,
             self.transcript_form,
             self.font_subset_form,
         ):
@@ -58,16 +59,21 @@ class HomeTaskForms(QWidget):
         self.workflow_transcript.setChecked(cfg.generate_transcript)
         self._set_combo_by_data(self.workflow_language, cfg.target_language)
         self._set_combo_by_data(self.translate_language, cfg.target_language)
+        self._set_combo_by_data(self.subtitle_mode, cfg.subtitle_mode)
 
         font_path = self._config_mgr.project_root / "fonts" / cfg.font_file
         if font_path.exists():
             font_text = str(font_path)
-            self.softsub_font.set_path(font_text)
-            self.hardsub_font.set_path(font_text)
+            self.subtitle_font.set_path(font_text)
             self.font_subset_font.set_path(font_text)
 
     def set_current_index(self, index: int) -> None:
         self.form_stack.setCurrentIndex(index)
+
+    def sync_task_defaults_from_config(self) -> None:
+        cfg = self._config_mgr.config
+        self.workflow_transcript.setChecked(cfg.generate_transcript)
+        self._set_combo_by_data(self.subtitle_mode, cfg.subtitle_mode)
 
     def get_urls(self, task_type: TaskType) -> list[str]:
         if task_type == TaskType.WORKFLOW:
@@ -92,17 +98,14 @@ class HomeTaskForms(QWidget):
                 "subtitle_file": path,
                 "target_language": self.translate_language.currentData(),
             }
-        if task_type == TaskType.SOFTSUB:
+        if task_type == TaskType.SUBTITLE:
             return self._collect_video_subtitle_font_params(
-                self.softsub_video,
-                self.softsub_subtitle,
-                self.softsub_font,
-            )
-        if task_type == TaskType.HARDSUB:
-            return self._collect_video_subtitle_font_params(
-                self.hardsub_video,
-                self.hardsub_subtitle,
-                self.hardsub_font,
+                self.subtitle_video,
+                self.subtitle_subtitle,
+                self.subtitle_font,
+                subtitle_mode=str(
+                    self.subtitle_mode.currentData() or SUBTITLE_MODE_SOFT
+                ),
             )
         if task_type == TaskType.TRANSCRIPT:
             if not (path := self.transcript_file.path()):
@@ -123,7 +126,9 @@ class HomeTaskForms(QWidget):
         layout.addWidget(FormRow(self.tr("URL:"), self.workflow_url))
         self.workflow_language = self._build_language_combo()
         layout.addWidget(FormRow(self.tr("Target Language:"), self.workflow_language))
-        self.workflow_transcript = QCheckBox(self.tr("Generate transcript"))
+        self.workflow_transcript = QCheckBox(
+            self.tr("Generate transcript in workflows")
+        )
         layout.addWidget(FormRow("", self.workflow_transcript))
         return widget
 
@@ -146,26 +151,19 @@ class HomeTaskForms(QWidget):
         layout.addWidget(FormRow(self.tr("Target Language:"), self.translate_language))
         return widget
 
-    def _build_softsub_form(self) -> QWidget:
+    def _build_subtitle_form(self) -> QWidget:
         widget = QWidget()
         layout = self._build_form_layout(widget)
-        self.softsub_video = self._build_video_picker()
-        self.softsub_subtitle = self._build_subtitle_picker()
-        self.softsub_font = self._build_font_picker()
-        layout.addWidget(FormRow(self.tr("Video File:"), self.softsub_video))
-        layout.addWidget(FormRow(self.tr("Subtitle File:"), self.softsub_subtitle))
-        layout.addWidget(FormRow(self.tr("Font File (optional):"), self.softsub_font))
-        return widget
-
-    def _build_hardsub_form(self) -> QWidget:
-        widget = QWidget()
-        layout = self._build_form_layout(widget)
-        self.hardsub_video = self._build_video_picker()
-        self.hardsub_subtitle = self._build_subtitle_picker()
-        self.hardsub_font = self._build_font_picker()
-        layout.addWidget(FormRow(self.tr("Video File:"), self.hardsub_video))
-        layout.addWidget(FormRow(self.tr("Subtitle File:"), self.hardsub_subtitle))
-        layout.addWidget(FormRow(self.tr("Font File (optional):"), self.hardsub_font))
+        self.subtitle_video = self._build_video_picker()
+        self.subtitle_subtitle = self._build_subtitle_picker()
+        self.subtitle_font = self._build_font_picker()
+        self.subtitle_mode = QComboBox()
+        for mode in (SUBTITLE_MODE_SOFT, SUBTITLE_MODE_HARD):
+            self.subtitle_mode.addItem(format_subtitle_mode_label(mode), mode)
+        layout.addWidget(FormRow(self.tr("Video File:"), self.subtitle_video))
+        layout.addWidget(FormRow(self.tr("Subtitle File:"), self.subtitle_subtitle))
+        layout.addWidget(FormRow(self.tr("Font File (optional):"), self.subtitle_font))
+        layout.addWidget(FormRow(self.tr("Subtitle Mode:"), self.subtitle_mode))
         return widget
 
     def _build_transcript_form(self) -> QWidget:
@@ -218,12 +216,18 @@ class HomeTaskForms(QWidget):
         video_picker: FilePicker,
         subtitle_picker: FilePicker,
         font_picker: FilePicker,
+        *,
+        subtitle_mode: str,
     ) -> dict[str, str] | None:
         video = video_picker.path()
         subtitle = subtitle_picker.path()
         if not video or not subtitle:
             return None
-        params = {"video_file": video, "subtitle_file": subtitle}
+        params = {
+            "video_file": video,
+            "subtitle_file": subtitle,
+            "subtitle_mode": subtitle_mode,
+        }
         if font := font_picker.path():
             params["font_file"] = font
         return params

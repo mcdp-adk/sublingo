@@ -17,9 +17,11 @@ from sublingo.core.config import (
     DEFAULT_AI_PROVIDER,
     DEFAULT_FONT_FILE,
     DEFAULT_PROXY_MODE,
+    DEFAULT_SUBTITLE_MODE,
     PROXY_MODE_CUSTOM,
     PROXY_MODE_DISABLED,
     PROXY_MODE_SYSTEM,
+    SUBTITLE_MODE_HARD,
 )
 from sublingo.core.constants import (
     AI_MAX_RETRIES,
@@ -45,6 +47,7 @@ class TestAppConfig:
         # Translation
         assert config.target_language == "auto"
         assert config.generate_transcript is False
+        assert config.subtitle_mode == DEFAULT_SUBTITLE_MODE
 
         # Font
         assert config.font_file == DEFAULT_FONT_FILE
@@ -80,6 +83,7 @@ class TestAppConfig:
             "output_dir",
             "target_language",
             "generate_transcript",
+            "subtitle_mode",
             "font_file",
             "ai_provider",
             "ai_base_url",
@@ -104,6 +108,7 @@ class TestAppConfig:
             output_dir="./custom_output",
             target_language="en",
             generate_transcript=True,
+            subtitle_mode=SUBTITLE_MODE_HARD,
             ai_provider="openai",
             ai_model="gpt-4",
             proxy_mode=PROXY_MODE_CUSTOM,
@@ -115,6 +120,7 @@ class TestAppConfig:
         assert config.output_dir == "./custom_output"
         assert config.target_language == "en"
         assert config.generate_transcript is True
+        assert config.subtitle_mode == SUBTITLE_MODE_HARD
         assert config.ai_provider == "openai"
         assert config.ai_model == "gpt-4"
         assert config.proxy_mode == PROXY_MODE_CUSTOM
@@ -193,6 +199,16 @@ class TestConfigManager:
         config = manager.load()
 
         assert config.proxy_mode == PROXY_MODE_SYSTEM
+
+    def test_load_normalizes_invalid_subtitle_mode(
+        self, manager: ConfigManager
+    ) -> None:
+        data = {"subtitle_mode": "invalid"}
+        manager.config_file.write_text(json.dumps(data))
+
+        config = manager.load()
+
+        assert config.subtitle_mode == DEFAULT_SUBTITLE_MODE
 
     def test_load_filters_unknown_fields(self, manager: ConfigManager) -> None:
         """Test that unknown fields are filtered out."""
@@ -321,6 +337,24 @@ class TestConfigManager:
 
         resolved = manager.resolve_output_dir()
         assert resolved == Path(absolute_path).resolve()
+
+    def test_resolve_project_dir_windows_absolute_kept_as_absolute_text(
+        self, manager: ConfigManager
+    ) -> None:
+        config = AppConfig(project_dir=r"C:\Users\joe\Videos")
+        manager.save(config)
+
+        resolved = manager.resolve_project_dir()
+        assert str(resolved) == r"C:\Users\joe\Videos"
+
+    def test_resolve_output_dir_windows_absolute_kept_as_absolute_text(
+        self, manager: ConfigManager
+    ) -> None:
+        config = AppConfig(output_dir=r"D:\Sublingo\Output")
+        manager.save(config)
+
+        resolved = manager.resolve_output_dir()
+        assert str(resolved) == r"D:\Sublingo\Output"
 
     def test_resolve_http_proxy_modes(self) -> None:
         system_policy = resolve_http_proxy_policy(

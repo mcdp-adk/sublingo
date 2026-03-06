@@ -9,11 +9,13 @@ from PySide6.QtCore import QObject, QTimer, Signal
 
 from sublingo.core.config import AppConfig
 from sublingo.core.config import ConfigManager
+from sublingo.core.config import SUBTITLE_MODE_HARD
 from sublingo.core.downloader import download
 from sublingo.core.ffmpeg import hardsub, softsub
 from sublingo.core.font import subset_font
 from sublingo.core.models import ProgressCallback
 from sublingo.core.network_policy import resolve_download_proxy
+from sublingo.core.path_policy import resolve_user_path
 from sublingo.core.transcript import generate_transcript
 from sublingo.core.translator import translate
 from sublingo.core.workflow import run_workflow
@@ -159,26 +161,24 @@ class TaskManager(QObject):
                 output_dir=output_dir,
                 progress=progress,
             )
-        if task.task_type == TaskType.SOFTSUB:
+        if task.task_type == TaskType.SUBTITLE:
             video_path = Path(str(task.params["video_file"]))
             subtitle_path = Path(str(task.params["subtitle_file"]))
             font_path = self._resolve_font_path(
                 task.params.get("font_file"), task_config
             )
+            subtitle_mode = str(
+                task.params.get("subtitle_mode") or task_config.subtitle_mode
+            )
+            if subtitle_mode == SUBTITLE_MODE_HARD:
+                return lambda progress: hardsub(
+                    video_path,
+                    subtitle_path,
+                    font_path=font_path,
+                    output_dir=output_dir,
+                    progress=progress,
+                )
             return lambda progress: softsub(
-                video_path,
-                subtitle_path,
-                font_path=font_path,
-                output_dir=output_dir,
-                progress=progress,
-            )
-        if task.task_type == TaskType.HARDSUB:
-            video_path = Path(str(task.params["video_file"]))
-            subtitle_path = Path(str(task.params["subtitle_file"]))
-            font_path = self._resolve_font_path(
-                task.params.get("font_file"), task_config
-            )
-            return lambda progress: hardsub(
                 video_path,
                 subtitle_path,
                 font_path=font_path,
@@ -341,7 +341,7 @@ class TaskManager(QObject):
     def _resolve_output_dir(self, params: dict[str, Any]) -> Path:
         raw_output_dir = params.get("output_dir")
         if raw_output_dir:
-            return Path(str(raw_output_dir)).resolve()
+            return resolve_user_path(str(raw_output_dir), self._config_mgr.project_root)
         return self._config_mgr.resolve_output_dir()
 
     def _resolve_glossary_dir(self) -> Path | None:

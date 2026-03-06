@@ -2,18 +2,20 @@
 
 from __future__ import annotations
 
-import json
 import logging
-import shutil
 from pathlib import Path
+from typing import Any, cast
+
+import yt_dlp
 
 logger = logging.getLogger(__name__)
+COOKIE_VALIDATION_TEST_URL: str = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
 
 def validate_cookie_file(path: Path) -> tuple[bool, str]:
     """Validate a cookie file format.
 
-    Checks for valid Netscape format (tab-separated) or JSON format.
+    Checks for valid Netscape format (tab-separated fields).
 
     Args:
         path: Path to the cookie file.
@@ -32,11 +34,7 @@ def validate_cookie_file(path: Path) -> tuple[bool, str]:
     if _is_netscape_format(content):
         return True, "Valid Netscape cookie format"
 
-    # Check JSON format
-    if _is_json_format(content):
-        return True, "Valid JSON cookie format"
-
-    return False, "Unrecognized cookie format (expected Netscape or JSON)"
+    return False, "Invalid cookie format (expected Netscape)"
 
 
 def _is_netscape_format(content: str) -> bool:
@@ -54,33 +52,49 @@ def _is_netscape_format(content: str) -> bool:
     return False
 
 
-def _is_json_format(content: str) -> bool:
-    """Check if content is valid JSON cookie format.
-
-    JSON format should be a list of cookie objects.
-    """
-    try:
-        data = json.loads(content)
-        if isinstance(data, list) and data:
-            return isinstance(data[0], dict)
-    except (json.JSONDecodeError, IndexError):
-        logger.debug("Content is not valid JSON format: %s", content[:100])
-    return False
-
-
-def import_cookie_file(source: Path, dest: Path) -> None:
-    """Copy cookie file to project location.
-
-    Args:
-        source: Source cookie file path.
-        dest: Destination path (typically project's cookies.txt).
-
-    Raises:
-        FileNotFoundError: If source file does not exist.
-        OSError: If copy operation fails.
-    """
-    if not source.exists():
-        raise FileNotFoundError(f"Source cookie file not found: {source}")
+def save_cookie_text(content: str, dest: Path) -> tuple[bool, str]:
+    normalized = content.strip()
+    if not normalized:
+        return False, "Cookie content is empty"
+    if not _is_netscape_format(normalized):
+        logger.debug("Invalid Netscape cookie content: %s", normalized[:120])
+        return False, "Invalid cookie format (expected Netscape)"
 
     dest.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(source, dest)
+    dest.write_text(f"{normalized}\n", encoding="utf-8")
+    return True, "Cookie saved"
+
+
+def validate_cookie_with_ytdlp(
+    cookie_file: Path,
+    *,
+    proxy: str | None,
+    test_url: str = COOKIE_VALIDATION_TEST_URL,
+) -> tuple[bool, str]:
+    format_ok, format_message = validate_cookie_file(cookie_file)
+    if not format_ok:
+        return False, format_message
+
+    opts: dict[str, object] = {
+        "cookiefile": str(cookie_file),
+        "extract_flat": True,
+        "simulate": True,
+        "skip_download": True,
+        "quiet": True,
+        "no_warnings": True,
+        "socket_timeout": 20,
+    }
+    if proxy is not None:
+        opts["proxy"] = proxy
+
+    try:
+        with yt_dlp.YoutubeDL(cast(Any, opts)) as ydl:
+            info = ydl.extract_info(test_url, download=False, process=False)
+    except Exception as exc:
+        return False, f"yt-dlp validation failed: {exc}"
+
+    if not isinstance(info, dict):
+        return False, "yt-dlp validation failed: invalid probe result"
+    if not info.get("id"):
+        return False, "yt-dlp validation failed: missing video id"
+    return True, "Cookie validated with yt-dlp"
