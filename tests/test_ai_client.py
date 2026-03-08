@@ -200,6 +200,24 @@ async def test_test_connection_returns_false_on_error():
 
 
 @pytest.mark.asyncio
+async def test_test_connection_normalizes_socks_dependency_hint() -> None:
+    FakeAsyncClient.queue = [
+        RuntimeError(
+            "Using SOCKS proxy, but the 'socksio' package is not installed. "
+            "Make sure to install httpx using `pip install httpx[socks]`."
+        )
+    ]
+    client = AiClient(base_url="https://api.example.com/v1", api_key="k", model="m")
+
+    ok, message = await client.test_connection()
+
+    assert ok is False
+    assert "uv sync" in message
+    assert "pip install" not in message
+    await client.close()
+
+
+@pytest.mark.asyncio
 async def test_segment_entries_merges_indices_from_llm_response():
     FakeAsyncClient.queue = [
         FakeResponse(200, {"choices": [{"message": {"content": "[[0,1],[2]]"}}]})

@@ -22,6 +22,12 @@ from sublingo.core.models import BilingualEntry, SubtitleEntry
 
 JSON_BLOCK_RE = re.compile(r"```(?:json)?\s*([\s\S]*?)\s*```")
 JSON_ARRAY_RE = re.compile(r"\[[\s\S]*\]")
+SOCKS_DEPENDENCY_ERROR_MARKER = "Using SOCKS proxy"
+SOCKS_DEPENDENCY_GUIDE_MARKER = "pip install httpx[socks]"
+SOCKS_DEPENDENCY_ERROR_MESSAGE = (
+    "Using SOCKS proxy, but SOCKS support dependencies are not installed. "
+    "Please run `uv sync` to install project dependencies (including httpx[socks])."
+)
 
 
 class AiClient:
@@ -181,7 +187,7 @@ class AiClient:
             )
             return True, content
         except Exception as exc:
-            return False, str(exc)
+            return False, _normalize_client_error_message(str(exc))
 
     async def close(self) -> None:
         await self._http.aclose()
@@ -239,7 +245,8 @@ class AiClient:
                 return "".join(chunks)
             return str(content)
 
-        raise RuntimeError(f"AI API call failed after retries: {last_error}")
+        detail = _normalize_client_error_message(str(last_error))
+        raise RuntimeError(f"AI API call failed after retries: {detail}")
 
     def _retry_delay(self, retry: int) -> float:
         return min(self.base_delay * math.pow(2, retry) + random.random(), 60.0)
@@ -350,3 +357,12 @@ def _extract_error_message(response: httpx.Response) -> str:
         if isinstance(error, dict) and isinstance(error.get("message"), str):
             return error["message"]
     return default
+
+
+def _normalize_client_error_message(message: str) -> str:
+    if (
+        SOCKS_DEPENDENCY_ERROR_MARKER in message
+        and SOCKS_DEPENDENCY_GUIDE_MARKER in message
+    ):
+        return SOCKS_DEPENDENCY_ERROR_MESSAGE
+    return message
